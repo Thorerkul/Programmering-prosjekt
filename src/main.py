@@ -20,7 +20,7 @@ class Player:
         self.col = pymath.Vector3(255, 255, 255) # temp color
 
     def tick(self):
-        self.check_input()
+        self.movementHandler()
 
         self.truepos.x += self.truespeed.x
         self.truepos.y += self.truespeed.y
@@ -30,21 +30,40 @@ class Player:
 
         pydraw.rect(screen, self.col, self.rect)
 
-    def check_input(self):
+    def movementHandler(self):
+        def try_move(x, y):
+            self.speed.y = y
+            self.speed.x = x
+            for block in blockList:
+                if self.rect.colliderect(block):
+                    self.speed.x += 0 - x
+                    self.speed.y += 0 - y
+
         keys = pg.key.get_pressed()
 
         if keys[pg.K_w]:
-            self.speed.y = -4
+            try_move(0, -4)
         else:
             self.speed.y = 0
         if keys[pg.K_s]:
-            self.speed.y = 4
+            try_move(0, 4)
+
         if keys[pg.K_a]:
-            self.speed.x = -4
+            try_move(-4, 0)
         else:
             self.speed.x = 0
         if keys[pg.K_d]:
-            self.speed.x = 4
+            try_move(4, 0)
+
+        if keys[pg.K_w] and keys[pg.K_a]:
+            try_move(-4, -4)
+        if keys[pg.K_w] and keys[pg.K_d]:
+            try_move(4, -4)
+
+        if keys[pg.K_s] and keys[pg.K_a]:
+            try_move(-4, 4)
+        if keys[pg.K_s] and keys[pg.K_d]:
+            try_move(4, 4)
 
 class Block:
     def __init__(self, pos, size):
