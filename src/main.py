@@ -34,13 +34,43 @@ class Player:
         keys = pg.key.get_pressed()
 
         if keys[pg.K_w]:
-            self.pos.y -= 4
+            self.speed.y = -4
+        else:
+            self.speed.y = 0
         if keys[pg.K_s]:
-            self.pos.y += 4
+            self.speed.y = 4
         if keys[pg.K_a]:
-            self.pos.x -= 4
+            self.speed.x = -4
+        else:
+            self.speed.x = 0
         if keys[pg.K_d]:
-            self.pos.x += 4
+            self.speed.x = 4
+
+class Block:
+    def __init__(self, pos, size):
+        self.pos = pymath.Vector2(pos)
+        self.size = pymath.Vector2(size)
+        self.col = pymath.Vector3(128, 128, 128) # temp color
+
+        self.truepos = pymath.Vector2(self.pos)
+        self.truespeed = pymath.Vector2(0, 0)
+        
+        self.rect = pg.Rect(self.pos.x, self.pos.y, self.size.x, self.size.y)
+
+    def tick(self):
+        self.camera()
+
+        self.truepos.x += self.truespeed.x
+        self.truepos.y += self.truespeed.y
+
+        self.rect.centerx = self.truepos.x
+        self.rect.centery = self.truepos.y
+
+        pydraw.rect(screen, self.col, self.rect)
+
+    def camera(self):
+        self.truespeed.x = 0 - player.speed.x
+        self.truespeed.y = 0 - player.speed.y
 
 pg.mixer.pre_init(44100, -16, 2, 512)
 pg.init()
@@ -55,7 +85,12 @@ game_font = pg.font.Font(None, 25)
 isRunning = True
 FPS = 60
 
+blockList = []
+
 player = Player((30, 30))
+
+block = Block((0, 0), (100, 100))
+blockList.append(block)
 
 while isRunning == True:
     for event in pg.event.get():
@@ -65,6 +100,9 @@ while isRunning == True:
     screen.fill((0, 0, 0))
 
     player.tick()
+
+    for block in blockList:
+        block.tick()
 
     pg.display.update()
     clock.tick(FPS)
