@@ -21,6 +21,7 @@ class Player:
 
     def tick(self):
         self.movementHandler()
+        self.checkCollisions()
 
         self.truepos.x += self.truespeed.x
         self.truepos.y += self.truespeed.y
@@ -32,12 +33,10 @@ class Player:
 
     def movementHandler(self):
         def try_move(x, y):
-            self.speed.y = y
-            self.speed.x = x
             for block in blockList:
-                if self.rect.colliderect(block):
-                    self.speed.x += 0 - x
-                    self.speed.y += 0 - y
+                if self.rect.colliderect(block.rect) == False:
+                    self.speed.x = x
+                    self.speed.y = y
 
         keys = pg.key.get_pressed()
 
@@ -65,6 +64,12 @@ class Player:
         if keys[pg.K_s] and keys[pg.K_d]:
             try_move(4, 4)
 
+    def checkCollisions(self):
+        for block in blockList:
+            if self.rect.colliderect(block.realrect):
+                self.speed.x += 0 - self.speed.x * 2
+                self.speed.y += 0 - self.speed.y * 2
+
 class Block:
     def __init__(self, pos, size):
         self.pos = pymath.Vector2(pos)
@@ -75,8 +80,10 @@ class Block:
         self.truespeed = pymath.Vector2(0, 0)
         
         self.rect = pg.Rect(self.pos.x, self.pos.y, self.size.x, self.size.y)
+        self.realrect = pg.Rect(self.pos.x - 10, self.pos.y - 10, self.size.x + 20, self.size.y + 20)
 
     def tick(self):
+        #if self.rect.colliderect(player) == False:
         self.camera()
 
         self.truepos.x += self.truespeed.x
@@ -85,6 +92,12 @@ class Block:
         self.rect.centerx = self.truepos.x
         self.rect.centery = self.truepos.y
 
+        #
+        self.realrect.centerx = self.truepos.x
+        self.realrect.centery = self.truepos.y
+        #
+
+        pydraw.rect(screen, (255, 0, 0), self.realrect)
         pydraw.rect(screen, self.col, self.rect)
 
     def camera(self):
@@ -118,10 +131,10 @@ while isRunning == True:
 
     screen.fill((0, 0, 0))
 
-    player.tick()
-
     for block in blockList:
         block.tick()
+
+    player.tick()
 
     pg.display.update()
     clock.tick(FPS)
