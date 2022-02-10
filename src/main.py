@@ -8,7 +8,7 @@ def quit():
     sys.exit()
 
 class Player:
-    def __init__(self, size):
+    def __init__(self, size, char="billy"):
         self.pos = pymath.Vector2(int(SCREEN_WIDTH / 2 - size[0] / 2), int(SCREEN_HEIGHT / 2 - size[1] / 2))
         self.size = pymath.Vector2(size)
         self.speed = pymath.Vector2(0, 0)
@@ -16,9 +16,45 @@ class Player:
         self.max_speed = 6
         self.canJump = False
         self.prev_keys = []
+        self.char = char
 
         self.rect = pg.Rect(self.pos.x, self.pos.y, self.size.x, self.size.y)
         self.col = pymath.Vector3(255, 255, 255) # temp color
+
+        self.load_sprites()
+
+    def load_sprites(self):
+        self.runningsprites = []
+
+        self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0001.png'))
+        self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0002.png'))
+        self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0003.png'))
+        self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0004.png'))
+        self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0005.png'))
+        self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0006.png'))
+        self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0007.png'))
+        self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0009.png'))
+        self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0010.png'))
+        self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0011.png'))
+        self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0012.png'))
+        self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0013.png'))
+        self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0014.png'))
+        self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0015.png'))
+        self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0016.png'))
+        self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0017.png'))
+        self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0018.png'))
+        self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0019.png'))
+        self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0020.png'))
+        self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0021.png'))
+        self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0022.png'))
+        self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0023.png'))
+        self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0024.png'))
+        self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0025.png'))
+        self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0026.png'))
+        self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0027.png'))
+        self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0028.png'))
+        self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0029.png'))
+        self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0030.png'))
 
     def tick(self):
         self.gravity()
@@ -45,7 +81,7 @@ class Player:
         if keys[pg.K_SPACE] and self.canJump:
             self.speed.y = 0 - self.max_speed * 2.2
             
-        #if keys[pg.K_e] != self.prev_keys[pg.K_e] and keys[pg.K_e]:
+        #if keys[pg.K_e]!= self.prev_keys[pg.K_e] and keys[pg.K_e]:
             #self.pickup()
         
         self.canJump = False
