@@ -45,8 +45,8 @@ class Player:
         if keys[pg.K_SPACE] and self.canJump:
             self.speed.y = 0 - self.max_speed * 2.2
             
-        if keys[pg.K_e] != self.prev_keys[pg.K_e] and keys[pg.K_e]:
-            self.pickup()
+        #if keys[pg.K_e] != self.prev_keys[pg.K_e] and keys[pg.K_e]:
+            #self.pickup()
         
         self.canJump = False
         self.prev_keys = keys
