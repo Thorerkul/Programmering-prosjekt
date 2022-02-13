@@ -98,12 +98,9 @@ class Player:
             
         if keys[pg.K_SPACE] and self.canJump:
             self.speed.y = 0 - self.max_speed * 2.2
-            
-        #if keys[pg.K_e]!= self.prev_keys[pg.K_e] and keys[pg.K_e]:
-            #self.pickup()
         
         self.canJump = False
-        self.prev_keys = keys
+        self.prev_keys = pg.key.get_pressed()
 
     def checkCollisions(self):
         for block in blockList:
@@ -203,7 +200,7 @@ FPS = 60
 blockList = []
 ballList = []
 
-player = Player((30, 30))
+player = Player((50, 50))
 
 floor = Block((0, SCREEN_HEIGHT - 20), (SCREEN_WIDTH, 100))
 blockList.append(floor)
@@ -220,6 +217,10 @@ while isRunning == True:
     for event in pg.event.get():
         if event.type == pg.QUIT:
             quit()
+
+        if event.type == pg.KEYDOWN:
+            if event.key == pg.K_e:
+                player.pickup()
 
     screen.fill((0, 0, 0))
 
