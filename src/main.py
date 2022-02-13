@@ -33,39 +33,44 @@ class Player:
     def load_sprites(self):
         self.runningsprites = []
 
-        self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0001.png'))
-        self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0002.png'))
-        self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0003.png'))
-        self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0004.png'))
-        self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0005.png'))
-        self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0006.png'))
-        self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0007.png'))
-        self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0009.png'))
-        self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0010.png'))
-        self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0011.png'))
-        self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0012.png'))
-        self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0013.png'))
-        self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0014.png'))
-        self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0015.png'))
-        self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0016.png'))
-        self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0017.png'))
-        self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0018.png'))
-        self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0019.png'))
-        self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0020.png'))
-        self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0021.png'))
-        self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0022.png'))
-        self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0023.png'))
-        self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0024.png'))
-        self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0025.png'))
-        self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0026.png'))
-        self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0027.png'))
-        self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0028.png'))
-        self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0029.png'))
-        self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0030.png'))
+        if self.char == "billy":
+            self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0001.png').convert_alpha())
+            self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0002.png').convert_alpha())
+            self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0003.png').convert_alpha())
+            self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0004.png').convert_alpha())
+            self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0005.png').convert_alpha())
+            self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0006.png').convert_alpha())
+            self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0007.png').convert_alpha())
+            self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0009.png').convert_alpha())
+            self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0010.png').convert_alpha())
+            self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0011.png').convert_alpha())
+            self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0012.png').convert_alpha())
+            self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0013.png').convert_alpha())
+            self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0014.png').convert_alpha())
+            self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0015.png').convert_alpha())
+            self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0016.png').convert_alpha())
+            self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0017.png').convert_alpha())
+            self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0018.png').convert_alpha())
+            self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0019.png').convert_alpha())
+            self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0020.png').convert_alpha())
+            self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0021.png').convert_alpha())
+            self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0022.png').convert_alpha())
+            self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0023.png').convert_alpha())
+            self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0024.png').convert_alpha())
+            self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0025.png').convert_alpha())
+            self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0026.png').convert_alpha())
+            self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0027.png').convert_alpha())
+            self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0028.png').convert_alpha())
+            self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0029.png').convert_alpha())
+            self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0030.png').convert_alpha())
+            self.standingSprite = pg.image.load(r'src\assets\art\karakterer\Billy\billy0031.png').convert_alpha()
+            self.airSprite = pg.image.load(r'src\assets\art\karakterer\Billy\billy0032.png').convert_alpha()
 
         # rescaling
         for i in range(len(self.runningsprites)):
             self.runningsprites[i] = pg.transform.scale(self.runningsprites[i], (int(self.size.x), int(self.size.y)))
+        self.standingSprite = pg.transform.scale(self.standingSprite, (int(self.size.x), int(self.size.y)))
+        self.airSprite = pg.transform.scale(self.airSprite, (int(self.size.x), int(self.size.y)))
 
     def tick(self):
         self.gravity()
@@ -78,7 +83,6 @@ class Player:
         self.rect.centerx = self.pos.x
         self.rect.centery = self.pos.y
 
-        pydraw.rect(screen, self.col, self.rect)
         screen.blit(self.animation(), self.rect)
 
     def movementHandler(self):
@@ -128,10 +132,16 @@ class Player:
         if self.current_frame >= 29:
             self.current_frame = 0
 
-        if self.lastMoveDir.x == 1:
-            img = pg.transform.flip(self.runningsprites[self.current_frame], True, False)
-        else:
+        if self.speed.x != 0 and self.speed.y <= 1 and self.speed.y >= 0:
             img = self.runningsprites[self.current_frame]
+
+        elif self.speed.y >= 1.5 or self.speed.y <= -0.5:
+            img = self.airSprite
+        else:
+            img = self.standingSprite
+
+        if self.lastMoveDir.x == 1:
+            img = pg.transform.flip(img, True, False)
 
         return img
 
@@ -195,8 +205,8 @@ ballList = []
 
 player = Player((30, 30))
 
-block = Block((0, SCREEN_HEIGHT - 20), (SCREEN_WIDTH, 100))
-blockList.append(block)
+floor = Block((0, SCREEN_HEIGHT - 20), (SCREEN_WIDTH, 100))
+blockList.append(floor)
 
 block = Block((60, 470), (100, 25))
 blockList.append(block)
