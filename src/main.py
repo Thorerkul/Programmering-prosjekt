@@ -22,6 +22,7 @@ class Player:
         self.canJump = False
         self.prev_keys = []
         self.char = char
+        self.lastMoveDir = pymath.Vector2(0, 0)
 
         self.rect = pg.Rect(self.pos.x, self.pos.y, self.size.x, self.size.y)
         self.col = pymath.Vector3(255, 255, 255) # temp color
@@ -77,17 +78,19 @@ class Player:
         self.rect.centerx = self.pos.x
         self.rect.centery = self.pos.y
 
-        #screen.blit(self.animation(), self.rect)
         pydraw.rect(screen, self.col, self.rect)
+        screen.blit(self.animation(), self.rect)
 
     def movementHandler(self):
         keys = pg.key.get_pressed()
         if keys[pg.K_a]:
             self.speed.x = 0 - self.max_speed
+            self.lastMoveDir.x = -1
         else:
             self.speed.x = 0
         if keys[pg.K_d]:
             self.speed.x = self.max_speed
+            self.lastMoveDir.x = 1
             
         if keys[pg.K_SPACE] and self.canJump:
             self.speed.y = 0 - self.max_speed * 2.2
@@ -121,10 +124,16 @@ class Player:
 
     def animation(self):
         self.current_frame += 1
+
         if self.current_frame >= 29:
             self.current_frame = 0
-        print(self.current_frame)
-        return self.runningsprites[self.current_frame]
+
+        if self.lastMoveDir.x == 1:
+            img = pg.transform.flip(self.runningsprites[self.current_frame], True, False)
+        else:
+            img = self.runningsprites[self.current_frame]
+
+        return img
 
 class Block:
     def __init__(self, pos, size):
