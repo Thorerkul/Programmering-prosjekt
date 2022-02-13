@@ -23,6 +23,7 @@ class Player:
         self.prev_keys = []
         self.char = char
         self.lastMoveDir = pymath.Vector2(0, 0)
+        self.hasBall = False
 
         self.rect = pg.Rect(self.pos.x, self.pos.y, self.size.x, self.size.y)
         self.col = pymath.Vector3(255, 255, 255) # temp color
@@ -118,10 +119,7 @@ class Player:
     def pickup(self):
         for ball in ballList:
             if self.rect.colliderect(ball):
-                if ball.isPickedUp:
-                    ball.isPickedUp = False
-                else:
-                    ball.isPickedUp = True
+                if self.hasBall
 
     def animation(self):
         self.current_frame += 1
