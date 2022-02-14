@@ -88,6 +88,20 @@ class Player:
                     self.canJump = True
                 else:
                     self.speed.y = 2
+
+        if self.rect.right >= SCREEN_WIDTH - 10:
+            while self.rect.right >= SCREEN_WIDTH - 10:
+                self.pos.x -= 1
+
+                self.rect.centerx = self.pos.x
+                self.rect.centery = self.pos.y
+                
+        if self.rect.left <= 10:
+            while self.rect.left <= 10:
+                self.pos.x += 1
+                
+                self.rect.centerx = self.pos.x
+                self.rect.centery = self.pos.y
     
     def gravity(self):
         if self.speed.y <= 15:
@@ -101,7 +115,13 @@ class Player:
                     del ball
                     self.hasBall = True
         else:
-            ball = Ball((self.pos.x, self.pos.y))
+            mouse_pos = pymath.Vector2(pg.mouse.get_pos())
+            dir = pymath.Vector2(mouse_pos.x - self.pos.x, mouse_pos.y - self.pos.y)
+            dir = dir.normalize()
+
+            dir = (dir[0] * 25, dir[1] * 25)
+
+            ball = Ball((self.pos.x, self.pos.y), speed=dir)
             ballList.append(ball)
             self.hasBall = False
 
@@ -114,7 +134,7 @@ class Player:
                 self.current_frame = 0
             img = self.runningsprites[self.current_frame]
 
-        elif self.speed.y >= 1.5 or self.speed.y <= -0.5:
+        elif self.speed.y >= 1.75 or self.speed.y <= -0.75:
             img = self.airSprite
         else:
             img = self.standingSprite
@@ -136,22 +156,43 @@ class Block:
         pydraw.rect(screen, self.col, self.rect)
 
 class Ball:
-    def __init__(self, pos):
+    def __init__(self, pos, speed=(0, 0)):
         self.pos = pymath.Vector2(pos)
         self.col = pymath.Vector3(255, 0, 0)
         self.size = 10
-        self.speed = pymath.Vector2(0, 0)
+        self.speed = pymath.Vector2(speed)
         
         self.rect = pg.Rect(self.pos.x - self.size, self.pos.y - self.size, self.size * 2, self.size * 2)
         
     def tick(self):
-        self.speed.y += 0.5
+        if self.speed.y < 15:
+            self.speed.y += 0.5
         for block in blockList:
             if self.rect.colliderect(block):
-                if self.rect.centery <= block.rect.centery:
+                if self.rect.bottom <= block.rect.top + 20:
+                    while self.rect.colliderect(block):
+                        self.pos.y -= 0.1
+
+                        self.rect.centerx = self.pos.x
+                        self.rect.centery = self.pos.y
+
                     self.speed.y = 0 - self.speed.y / 1.3
+                    self.speed.x /= 1.1
                 else:
-                    self.speed.y = -2
+                    while self.rect.colliderect(block):
+                        self.pos.y += 0.1
+
+                        self.rect.centerx = self.pos.x
+                        self.rect.centery = self.pos.y
+                    self.speed.y = 0 - self.speed.y / 1.3
+                    self.speed.x /= 1.1
+
+        if self.rect.right >= SCREEN_WIDTH - 10:
+            if self.speed.x >= 0:
+                self.speed.x = 0 - self.speed.x / 1.3
+        if self.rect.left <= 10:
+            if self.speed.x <= 0:
+                self.speed.x = 0 - self.speed.x / 1.3
                     
         self.pos.x += self.speed.x
         self.pos.y += self.speed.y
@@ -182,7 +223,7 @@ player = Player((50, 50))
 floor = Block((0, SCREEN_HEIGHT - 20), (SCREEN_WIDTH, 100))
 blockList.append(floor)
 
-block = Block((60, 470), (100, 25))
+block = Block((60, 470), (100, 30))
 blockList.append(block)
 
 test = Ball((50, 50))
