@@ -135,9 +135,7 @@ class Player:
             self.hasBall = False
 
     def animation(self):
-        # print(self.current_frame)
-
-        if self.speed.x != 0 and self.speed.y <= 1 and self.speed.y >= 0:
+        if self.canJump == False:
             self.current_frame += 1
             if self.current_frame >= len(self.runningsprites):
                 self.current_frame = 0
@@ -174,6 +172,8 @@ class Ball:
         self.col = pymath.Vector3(255, 0, 0)
         self.size = 10
         self.speed = pymath.Vector2(speed)
+
+        self.bounceSound = pg.mixer.Sound(r'src\assets\lyd\ballBounce.wav')
         
         self.rect = pg.Rect(self.pos.x - self.size, self.pos.y - self.size, self.size * 2, self.size * 2)
         
@@ -191,6 +191,7 @@ class Ball:
 
                     self.speed.y = 0 - self.speed.y / 1.3
                     self.speed.x /= 1.1
+                    self.bounceSound.play()
                 else:
                     while self.rect.colliderect(block):
                         self.pos.y += 0.1
