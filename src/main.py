@@ -28,6 +28,7 @@ class Player:
 
     def loadSprites(self):
         self.runningsprites = []
+        self.holdingsprites = []
 
         if self.char == "billy":
             path = 'src\\assets\\art\\karakterer\\Billy\\billy00'
@@ -39,6 +40,12 @@ class Player:
 
                 self.runningsprites.append(pg.image.load(file).convert_alpha())
 
+            for i in range(30):
+                file = path + str(i + 32) + '.png'
+                print(file)
+
+                self.holdingsprites.append(pg.image.load(file).convert_alpha())
+
             self.standingSprite = pg.image.load(r'src\assets\art\karakterer\Billy\billyStanding.png').convert_alpha()
             self.airSprite = pg.image.load(r'src\assets\art\karakterer\Billy\billyAir.png').convert_alpha()
 
@@ -47,6 +54,8 @@ class Player:
         # rescaling
         for i in range(len(self.runningsprites)):
             self.runningsprites[i] = pg.transform.scale(self.runningsprites[i], (int(self.size.x), int(self.size.y)))
+        for i in range(len(self.holdingsprites)):
+            self.holdingsprites[i] = pg.transform.scale(self.holdingsprites[i], (int(self.size.x), int(self.size.y)))
         self.standingSprite = pg.transform.scale(self.standingSprite, (int(self.size.x), int(self.size.y)))
         self.airSprite = pg.transform.scale(self.airSprite, (int(self.size.x), int(self.size.y)))
 
@@ -132,7 +141,11 @@ class Player:
             self.current_frame += 1
             if self.current_frame >= len(self.runningsprites):
                 self.current_frame = 0
-            img = self.runningsprites[self.current_frame]
+
+            if self.hasBall == False:
+                img = self.runningsprites[self.current_frame]
+            else:
+                img = self.holdingsprites[self.current_frame]
 
         elif self.speed.y >= 1.75 or self.speed.y <= -0.75:
             img = self.airSprite
