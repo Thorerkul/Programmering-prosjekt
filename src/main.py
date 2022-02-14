@@ -1,4 +1,4 @@
-import sys, random, math
+import sys, random, math, os, glob
 import pygame as pg
 import pygame.math as pymath
 import pygame.draw as pydraw
@@ -23,44 +23,22 @@ class Player:
         self.rect = pg.Rect(self.pos.x, self.pos.y, self.size.x, self.size.y)
         self.col = pymath.Vector3(255, 255, 255) # temp color
 
-        self.load_sprites()
+        self.loadSprites()
         self.current_frame = 0
 
-    def load_sprites(self):
+    def loadSprites(self):
         self.runningsprites = []
 
         if self.char == "billy":
-            self.runningsprites.append(pg.image.load(r'assets\art\karakterer\Billy\billy0001.png').convert_alpha())
-            self.runningsprites.append(pg.image.load(r'assets\art\karakterer\Billy\billy0002.png').convert_alpha())
-            self.runningsprites.append(pg.image.load(r'assets\art\karakterer\Billy\billy0003.png').convert_alpha())
-            self.runningsprites.append(pg.image.load(r'assets\art\karakterer\Billy\billy0004.png').convert_alpha())
-            self.runningsprites.append(pg.image.load(r'assets\art\karakterer\Billy\billy0005.png').convert_alpha())
-            self.runningsprites.append(pg.image.load(r'assets\art\karakterer\Billy\billy0006.png').convert_alpha())
-            self.runningsprites.append(pg.image.load(r'assets\art\karakterer\Billy\billy0007.png').convert_alpha())
-            self.runningsprites.append(pg.image.load(r'assets\art\karakterer\Billy\billy0009.png').convert_alpha())
-            self.runningsprites.append(pg.image.load(r'assets\art\karakterer\Billy\billy0010.png').convert_alpha())
-            self.runningsprites.append(pg.image.load(r'assets\art\karakterer\Billy\billy0011.png').convert_alpha())
-            self.runningsprites.append(pg.image.load(r'assets\art\karakterer\Billy\billy0012.png').convert_alpha())
-            self.runningsprites.append(pg.image.load(r'assets\art\karakterer\Billy\billy0013.png').convert_alpha())
-            self.runningsprites.append(pg.image.load(r'assets\art\karakterer\Billy\billy0014.png').convert_alpha())
-            self.runningsprites.append(pg.image.load(r'assets\art\karakterer\Billy\billy0015.png').convert_alpha())
-            self.runningsprites.append(pg.image.load(r'assets\art\karakterer\Billy\billy0016.png').convert_alpha())
-            self.runningsprites.append(pg.image.load(r'assets\art\karakterer\Billy\billy0017.png').convert_alpha())
-            self.runningsprites.append(pg.image.load(r'assets\art\karakterer\Billy\billy0018.png').convert_alpha())
-            self.runningsprites.append(pg.image.load(r'assets\art\karakterer\Billy\billy0019.png').convert_alpha())
-            self.runningsprites.append(pg.image.load(r'assets\art\karakterer\Billy\billy0020.png').convert_alpha())
-            self.runningsprites.append(pg.image.load(r'assets\art\karakterer\Billy\billy0021.png').convert_alpha())
-            self.runningsprites.append(pg.image.load(r'assets\art\karakterer\Billy\billy0022.png').convert_alpha())
-            self.runningsprites.append(pg.image.load(r'assets\art\karakterer\Billy\billy0023.png').convert_alpha())
-            self.runningsprites.append(pg.image.load(r'assets\art\karakterer\Billy\billy0024.png').convert_alpha())
-            self.runningsprites.append(pg.image.load(r'assets\art\karakterer\Billy\billy0025.png').convert_alpha())
-            self.runningsprites.append(pg.image.load(r'assets\art\karakterer\Billy\billy0026.png').convert_alpha())
-            self.runningsprites.append(pg.image.load(r'assets\art\karakterer\Billy\billy0027.png').convert_alpha())
-            self.runningsprites.append(pg.image.load(r'assets\art\karakterer\Billy\billy0028.png').convert_alpha())
-            self.runningsprites.append(pg.image.load(r'assets\art\karakterer\Billy\billy0029.png').convert_alpha())
-            self.runningsprites.append(pg.image.load(r'assets\art\karakterer\Billy\billy0030.png').convert_alpha())
-            self.standingSprite = pg.image.load(r'assets\art\karakterer\Billy\billy0031.png').convert_alpha()
-            self.airSprite = pg.image.load(r'assets\art\karakterer\Billy\billy0032.png').convert_alpha()
+            for file in glob.glob('src\assets\art\karakterer\Billy\billy00*.png'):
+                print(file)
+                self.runningsprites.append(pg.image.load(file).convert_alpha())
+            print("Done importing")
+
+            self.standingSprite = pg.image.load(r'src\assets\art\karakterer\Billy\billyStanding.png').convert_alpha()
+            self.airSprite = pg.image.load(r'src\assets\art\karakterer\Billy\billyAir.png').convert_alpha()
+
+            # self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0001.png').convert_alpha())
 
         # rescaling
         for i in range(len(self.runningsprites)):
@@ -80,7 +58,6 @@ class Player:
         self.rect.centery = self.pos.y
 
         screen.blit(self.animation(), self.rect)
-        print(self.hasBall)
 
     def movementHandler(self):
         keys = pg.key.get_pressed()
@@ -113,22 +90,24 @@ class Player:
             self.speed.y += self._gravity
 
     def pickup(self):
-        for ball in ballList:
-            if self.hasBall == True:
-                self.hasBall = False
-                ball.isPickedUp = False
-            if self.hasBall == False:
+        if self.hasBall == False:
+            for ball in ballList:
                 if self.rect.colliderect(ball):
+                    ballList.remove(ball)
+                    del ball
                     self.hasBall = True
-                    ball.isPickedUp = True
+        else:
+            ball = Ball((self.pos.x, self.pos.y))
+            ballList.append(ball)
+            self.hasBall = False
 
     def animation(self):
-        self.current_frame += 1
-
-        if self.current_frame >= 29:
-            self.current_frame = 0
+        # print(self.current_frame)
 
         if self.speed.x != 0 and self.speed.y <= 1 and self.speed.y >= 0:
+            self.current_frame += 1
+            if self.current_frame >= len(self.runningsprites):
+                self.current_frame = 0
             img = self.runningsprites[self.current_frame]
 
         elif self.speed.y >= 1.5 or self.speed.y <= -0.5:
@@ -158,21 +137,17 @@ class Ball:
         self.col = pymath.Vector3(255, 0, 0)
         self.size = 10
         self.speed = pymath.Vector2(0, 0)
-        self.isPickedUp = False
         
         self.rect = pg.Rect(self.pos.x - self.size, self.pos.y - self.size, self.size * 2, self.size * 2)
         
     def tick(self):
-        if self.isPickedUp and player.hasBall:
-            self.pos = player.pos
-        else:
-            self.speed.y += 0.5
-            for block in blockList:
-                if self.rect.colliderect(block):
-                    if self.rect.centery <= block.rect.centery:
-                        self.speed.y = 0 - self.speed.y / 1.3
-                    else:
-                        self.speed.y = -2
+        self.speed.y += 0.5
+        for block in blockList:
+            if self.rect.colliderect(block):
+                if self.rect.centery <= block.rect.centery:
+                    self.speed.y = 0 - self.speed.y / 1.3
+                else:
+                    self.speed.y = -2
                     
         self.pos.x += self.speed.x
         self.pos.y += self.speed.y
