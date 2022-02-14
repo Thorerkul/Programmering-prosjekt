@@ -1,4 +1,4 @@
-import sys, random, math, os, glob
+import sys, random, math
 import pygame as pg
 import pygame.math as pymath
 import pygame.draw as pydraw
@@ -30,10 +30,14 @@ class Player:
         self.runningsprites = []
 
         if self.char == "billy":
-            for file in glob.glob('src\assets\art\karakterer\Billy\billy00*.png'):
-                print(file)
+            path = 'src\\assets\\art\\karakterer\\Billy\\billy00'
+            for i in range(30):
+                if i >= 9:
+                    file = path + str(i + 1) + '.png'
+                else:
+                    file = path + '0' + str(i + 1) + '.png'
+
                 self.runningsprites.append(pg.image.load(file).convert_alpha())
-            print("Done importing")
 
             self.standingSprite = pg.image.load(r'src\assets\art\karakterer\Billy\billyStanding.png').convert_alpha()
             self.airSprite = pg.image.load(r'src\assets\art\karakterer\Billy\billyAir.png').convert_alpha()
