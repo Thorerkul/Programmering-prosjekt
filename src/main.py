@@ -19,6 +19,12 @@ class Player:
         self.char = char
         self.lastMoveDir = pymath.Vector2(0, 0)
         self.hasBall = False
+        self.isOnGround = False
+        self.isGoingUp = False
+
+        self.jumpsfx = pg.mixer.Sound(r'src\assets\lyd\jump.wav')
+        self.pickupsfx = pg.mixer.Sound(r'src\assets\lyd\pickup.wav')
+        self.throwsfx = pg.mixer.Sound(r'src\assets\lyd\throw.wav')
 
         self.rect = pg.Rect(self.pos.x, self.pos.y, self.size.x, self.size.y)
         self.col = pymath.Vector3(255, 255, 255) # temp color
@@ -71,6 +77,7 @@ class Player:
         self.rect.centery = self.pos.y
 
         screen.blit(self.animation(), self.rect)
+        self.canJump = False
 
     def movementHandler(self):
         keys = pg.key.get_pressed()
@@ -85,8 +92,8 @@ class Player:
             
         if keys[pg.K_SPACE] and self.canJump:
             self.speed.y = 0 - self.max_speed * 2.2
+            if isMuted == False: self.jumpsfx.play()
         
-        self.canJump = False
         self.prev_keys = pg.key.get_pressed()
 
     def checkCollisions(self):
@@ -123,6 +130,7 @@ class Player:
                     ballList.remove(ball)
                     del ball
                     self.hasBall = True
+                    if isMuted == False: self.pickupsfx.play()
         else:
             mouse_pos = pymath.Vector2(pg.mouse.get_pos())
             dir = pymath.Vector2(mouse_pos.x - self.pos.x, mouse_pos.y - self.pos.y)
@@ -133,27 +141,62 @@ class Player:
             ball = Ball((self.pos.x, self.pos.y), speed=dir)
             ballList.append(ball)
             self.hasBall = False
+            if isMuted == False: self.throwsfx.play()
 
     def animation(self):
-        if self.canJump == False:
+        self.stateMachine()
+        img = self.standingSprite
+
+        if self.isOnGround:
             self.current_frame += 1
             if self.current_frame >= len(self.runningsprites):
                 self.current_frame = 0
-
-            if self.hasBall == False:
-                img = self.runningsprites[self.current_frame]
-            else:
+            if self.hasBall:
                 img = self.holdingsprites[self.current_frame]
-
-        elif self.speed.y >= 1.75 or self.speed.y <= -0.75:
-            img = self.airSprite
+                if self.hasBall: self.drawBall()
+            else:
+                img = self.runningsprites[self.current_frame]
+            if self.speed.x == 0:
+                img = self.standingSprite
+                if self.hasBall:
+                    img = self.airSprite
         else:
-            img = self.standingSprite
+            if self.isGoingUp and self.hasBall == False:
+                img = self.standingSprite
+            else:
+                img = self.airSprite
+                if self.hasBall: self.drawBall()
 
         if self.lastMoveDir.x == 1:
             img = pg.transform.flip(img, True, False)
 
         return img
+
+    def stateMachine(self):
+        for block in blockList:
+            if self.rect.bottom + 10 <= block.rect.top:
+                self.isOnGround = True
+                break
+            else:
+                self.isOnGround = False
+            # lazy programming
+        if self.isOnGround:
+            self.isOnGround = False
+        else:
+            self.isOnGround = True
+
+        if self.speed.y < 2 and self.isOnGround == False:
+            self.isGoingUp = True
+        else:
+            self.isGoingUp = False
+
+
+        print(self.isOnGround, self.isGoingUp, self.speed.x)
+
+    def drawBall(self):
+        ball = Ball((self.pos.x, self.pos.y - self.size.y / 2 -  5))
+        screen.blit(ball.image, ball.rect)
+        del ball
 
 class Block:
     def __init__(self, pos, size):
@@ -174,6 +217,9 @@ class Ball:
         self.speed = pymath.Vector2(speed)
 
         self.bounceSound = pg.mixer.Sound(r'src\assets\lyd\ballBounce.wav')
+
+        self.image = pg.image.load(r'src\assets\art\Basic_ball.png').convert_alpha()
+        self.image = pg.transform.scale(self.image, (self.size + 9, self.size + 9))
         
         self.rect = pg.Rect(self.pos.x - self.size, self.pos.y - self.size, self.size * 2, self.size * 2)
         
@@ -191,7 +237,7 @@ class Ball:
 
                     self.speed.y = 0 - self.speed.y / 1.3
                     self.speed.x /= 1.1
-                    self.bounceSound.play()
+                    if isMuted == False: self.bounceSound.play()
                 else:
                     while self.rect.colliderect(block):
                         self.pos.y += 0.1
@@ -200,21 +246,24 @@ class Ball:
                         self.rect.centery = self.pos.y
                     self.speed.y = 0 - self.speed.y / 1.3
                     self.speed.x /= 1.1
+                    if isMuted == False: self.bounceSound.play()
 
         if self.rect.right >= SCREEN_WIDTH - 10:
             if self.speed.x >= 0:
                 self.speed.x = 0 - self.speed.x / 1.3
+                if isMuted == False: self.bounceSound.play()
         if self.rect.left <= 10:
             if self.speed.x <= 0:
                 self.speed.x = 0 - self.speed.x / 1.3
+                if isMuted == False: self.bounceSound.play()
                     
         self.pos.x += self.speed.x
         self.pos.y += self.speed.y
         
         self.rect.centerx = self.pos.x
         self.rect.centery = self.pos.y
-        
-        pydraw.circle(screen, self.col, self.pos, self.size)
+
+        screen.blit(self.image, self.rect)
 
 pg.mixer.pre_init(44100, -16, 2, 512)
 pg.init()
@@ -228,21 +277,20 @@ clock = pg.time.Clock()
 game_font = pg.font.Font(None, 25)
 isRunning = True
 FPS = 60
+isMuted = True
 
 blockList = []
 ballList = []
 
 player = Player((50, 50))
 
-floor = Block((0, SCREEN_HEIGHT - 20), (SCREEN_WIDTH, 100))
-blockList.append(floor)
+block = Block((0, SCREEN_HEIGHT - 20), (SCREEN_WIDTH, 100))
+blockList.append(block)
 
 block = Block((60, 470), (100, 30))
 blockList.append(block)
 
 test = Ball((50, 50))
-ballList.append(test)
-test = Ball((1050, 50))
 ballList.append(test)
 
 while isRunning == True:
@@ -251,6 +299,12 @@ while isRunning == True:
             quit()
 
         if event.type == pg.KEYDOWN:
+            if event.key == pg.K_m:
+                if isMuted:
+                    isMuted = False
+                else:
+                    isMuted = True
+
             if event.key == pg.K_e:
                 player.pickup()
 
