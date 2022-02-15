@@ -8,8 +8,8 @@ def quit():
     sys.exit()
 
 class Player:
-    def __init__(self, size, char="billy"):
-        self.pos = pymath.Vector2(int(SCREEN_WIDTH / 2 - size[0] / 2), int(SCREEN_HEIGHT / 2 - size[1] / 2))
+    def __init__(self, size, pos, char="billy"):
+        self.pos = pymath.Vector2(pos)
         self.size = pymath.Vector2(size)
         self.speed = pymath.Vector2(0, 0)
         self._gravity = 0.5
@@ -48,14 +48,11 @@ class Player:
 
             for i in range(30):
                 file = path + str(i + 32) + '.png'
-                print(file)
 
                 self.holdingsprites.append(pg.image.load(file).convert_alpha())
 
             self.standingSprite = pg.image.load(r'src\assets\art\karakterer\Billy\billyStanding.png').convert_alpha()
             self.airSprite = pg.image.load(r'src\assets\art\karakterer\Billy\billyAir.png').convert_alpha()
-
-            # self.runningsprites.append(pg.image.load(r'src\assets\art\karakterer\Billy\billy0001.png').convert_alpha())
 
         # rescaling
         for i in range(len(self.runningsprites)):
@@ -190,9 +187,6 @@ class Player:
         else:
             self.isGoingUp = False
 
-
-        print(self.isOnGround, self.isGoingUp, self.speed.x)
-
     def drawBall(self):
         ball = Ball((self.pos.x, self.pos.y - self.size.y / 2 -  5))
         screen.blit(ball.image, ball.rect)
@@ -281,13 +275,15 @@ isMuted = True
 
 blockList = []
 ballList = []
+playerList = []
 
-player = Player((50, 50))
+player = Player((50, 50), (50, 50))
+playerList.append(player)
 
-block = Block((0, SCREEN_HEIGHT - 20), (SCREEN_WIDTH, 100))
+block = Block((170, 550), (100, 30))
 blockList.append(block)
 
-block = Block((60, 470), (100, 30))
+block = Block((0, SCREEN_HEIGHT - 20), (SCREEN_WIDTH, 100))
 blockList.append(block)
 
 test = Ball((50, 50))
@@ -306,14 +302,16 @@ while isRunning == True:
                     isMuted = True
 
             if event.key == pg.K_e:
-                player.pickup()
+                for player in playerList:
+                    player.pickup()
 
     screen.fill((0, 0, 0))
 
     for block in blockList:
         block.tick()
 
-    player.tick()
+    for player in playerList:
+        player.tick()
     
     for ball in ballList:
         ball.tick()
