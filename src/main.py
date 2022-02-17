@@ -171,7 +171,7 @@ class Player:
 
     def stateMachine(self):
         for block in blockList:
-            if self.rect.bottom + 10 <= block.rect.top:
+            if self.rect.bottom + 3 <= block.rect.top:
                 self.isOnGround = True
                 break
             else:
@@ -280,7 +280,7 @@ playerList = []
 player = Player((50, 50), (50, 50))
 playerList.append(player)
 
-block = Block((170, 550), (100, 30))
+block = Block((170, 600), (200, 30))
 blockList.append(block)
 
 block = Block((0, SCREEN_HEIGHT - 20), (SCREEN_WIDTH, 100))
