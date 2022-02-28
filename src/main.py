@@ -286,6 +286,29 @@ class Ball:
 
         screen.blit(self.image, self.rect)
 
+class ParticleSystem:
+    def __init__(self, num, spread, speed, gravity, col):
+        self.maxnum = num
+        self.spread = spread
+        self.startspeed = speed
+        self.gravity = gravity
+        self.col = col
+        
+        self.particleList = []
+        self.num = 0
+    
+    def tick(self):
+        if self.num < self.maxnum:
+            self.spawnParticle()
+            
+        for particle in particleList:
+            particle.centery += self.gravity
+            particle.center
+            pydraw.rect(screen, self.col, particle)
+    
+    def spawnParticle(self):
+        pass
+
 pg.mixer.pre_init(44100, -16, 2, 512)
 pg.init()
 
