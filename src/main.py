@@ -22,9 +22,9 @@ class Player:
         self.isOnGround = False
         self.isGoingUp = False
 
-        self.jumpsfx = pg.mixer.Sound(r'src\assets\lyd\jump.wav')
-        self.pickupsfx = pg.mixer.Sound(r'src\assets\lyd\pickup.wav')
-        self.throwsfx = pg.mixer.Sound(r'src\assets\lyd\throw.wav')
+        self.jumpsfx = pg.mixer.Sound(r'assets\lyd\jump.wav')
+        self.pickupsfx = pg.mixer.Sound(r'assets\lyd\pickup.wav')
+        self.throwsfx = pg.mixer.Sound(r'assets\lyd\throw.wav')
 
         self.rect = pg.Rect(self.pos.x, self.pos.y, self.size.x, self.size.y)
         self.col = pymath.Vector3(255, 255, 255) # temp color
@@ -37,7 +37,7 @@ class Player:
         self.holdingsprites = []
 
         if self.char == "billy":
-            path = 'src\\assets\\art\\karakterer\\Billy\\billy00'
+            path = 'assets\\art\\karakterer\\Billy\\billy00'
             for i in range(30):
                 if i >= 9:
                     file = path + str(i + 1) + '.png'
@@ -51,8 +51,8 @@ class Player:
 
                 self.holdingsprites.append(pg.image.load(file).convert_alpha())
 
-            self.standingSprite = pg.image.load(r'src\assets\art\karakterer\Billy\billyStanding.png').convert_alpha()
-            self.airSprite = pg.image.load(r'src\assets\art\karakterer\Billy\billyAir.png').convert_alpha()
+            self.standingSprite = pg.image.load(r'assets\art\karakterer\Billy\billyStanding.png').convert_alpha()
+            self.airSprite = pg.image.load(r'assets\art\karakterer\Billy\billyAir.png').convert_alpha()
 
         # rescaling
         for i in range(len(self.runningsprites)):
@@ -210,9 +210,9 @@ class Ball:
         self.size = 10
         self.speed = pymath.Vector2(speed)
 
-        self.bounceSound = pg.mixer.Sound(r'src\assets\lyd\ballBounce.wav')
+        self.bounceSound = pg.mixer.Sound(r'assets\lyd\ballBounce.wav')
 
-        self.image = pg.image.load(r'src\assets\art\Basic_ball.png').convert_alpha()
+        self.image = pg.image.load(r'assets\art\Basic_ball.png').convert_alpha()
         self.image = pg.transform.scale(self.image, (self.size + 9, self.size + 9))
         
         self.rect = pg.Rect(self.pos.x - self.size, self.pos.y - self.size, self.size * 2, self.size * 2)
