@@ -36,7 +36,7 @@ class Player:
         self.runningsprites = []
         self.holdingsprites = []
 
-        if self.char == "billy":
+        if self.char == "billy" or self.char == "dummy":
             path = 'assets\\art\\karakterer\\Billy\\billy00'
             for i in range(30):
                 if i >= 9:
@@ -77,21 +77,22 @@ class Player:
         self.canJump = False
 
     def movementHandler(self):
-        keys = pg.key.get_pressed()
-        if keys[pg.K_a]:
-            self.speed.x = 0 - self.max_speed
-            self.lastMoveDir.x = -1
-        else:
-            self.speed.x = 0
-        if keys[pg.K_d]:
-            self.speed.x = self.max_speed
-            self.lastMoveDir.x = 1
+        if self.char == "billy":
+            keys = pg.key.get_pressed()
+            if keys[pg.K_a]:
+                self.speed.x = 0 - self.max_speed
+                self.lastMoveDir.x = -1
+            else:
+                self.speed.x = 0
+            if keys[pg.K_d]:
+                self.speed.x = self.max_speed
+                self.lastMoveDir.x = 1
+                
+            if keys[pg.K_SPACE] and self.canJump:
+                self.speed.y = 0 - self.max_speed * 2.2
+                if isMuted == False: self.jumpsfx.play()
             
-        if keys[pg.K_SPACE] and self.canJump:
-            self.speed.y = 0 - self.max_speed * 2.2
-            if isMuted == False: self.jumpsfx.play()
-        
-        self.prev_keys = pg.key.get_pressed()
+            self.prev_keys = pg.key.get_pressed()
 
     def checkCollisions(self):
         for block in blockList:
@@ -134,6 +135,8 @@ class Player:
             dir = dir.normalize()
 
             dir = (dir[0] * 25, dir[1] * 25)
+            
+            dir = (0 - dir[0], 0 - dir[1])
 
             ball = Ball((self.pos.x, self.pos.y), speed=dir)
             ballList.append(ball)
@@ -215,6 +218,9 @@ class Ball:
         self.image = pg.image.load(r'assets\art\Basic_ball.png').convert_alpha()
         self.image = pg.transform.scale(self.image, (self.size + 9, self.size + 9))
         
+        self.boucesLeft = 3
+        self.isThrown = True
+        
         self.rect = pg.Rect(self.pos.x - self.size, self.pos.y - self.size, self.size * 2, self.size * 2)
         
     def tick(self):
@@ -232,6 +238,7 @@ class Ball:
                     self.speed.y = 0 - self.speed.y / 1.3
                     self.speed.x /= 1.1
                     if isMuted == False: self.bounceSound.play()
+                    self.boucesLeft -= 1
                 else:
                     while self.rect.colliderect(block):
                         self.pos.y += 0.1
@@ -241,16 +248,36 @@ class Ball:
                     self.speed.y = 0 - self.speed.y / 1.3
                     self.speed.x /= 1.1
                     if isMuted == False: self.bounceSound.play()
+                    self.boucesLeft -= 1
 
         if self.rect.right >= SCREEN_WIDTH - 10:
             if self.speed.x >= 0:
                 self.speed.x = 0 - self.speed.x / 1.3
                 if isMuted == False: self.bounceSound.play()
+                self.boucesLeft -= 1
         if self.rect.left <= 10:
             if self.speed.x <= 0:
                 self.speed.x = 0 - self.speed.x / 1.3
                 if isMuted == False: self.bounceSound.play()
+                self.boucesLeft -= 1
+                
+        for player in playerList:
+            if self.rect.colliderect(player):
+                if self.isThrown:
+                    self.speed.x = 0 - self.speed.x
+                    self.speed.y = 0 - self.speed.y
                     
+                    while self.rect.colliderect(player):
+                        self.pos.x += self.speed.x
+                        self.pos.y += self.speed.y
+                        
+                        self.rect.centerx = self.pos.x
+                        self.rect.centery = self.pos.y
+                    self.boucesLeft -= 1
+                    
+        if self.boucesLeft <= 0:
+            self.isThrown = False
+                
         self.pos.x += self.speed.x
         self.pos.y += self.speed.y
         
@@ -273,12 +300,22 @@ isRunning = True
 FPS = 60
 isMuted = True
 
+def load_music():
+    x = random.randint(1, 3)
+    y = 'assets\lyd\Music\Juhani Junkala [Retro Game Music Pack] Level ' + str(x) + '.wav'
+    pg.mixer.music.load(y)
+
+load_music()
+
 blockList = []
 ballList = []
 playerList = []
 
 player = Player((50, 50), (50, 50))
 playerList.append(player)
+
+dummy = Player((50, 50), (500, 50), char="dummy")
+playerList.append(dummy)
 
 block = Block((170, 600), (200, 30))
 blockList.append(block)
@@ -289,6 +326,8 @@ blockList.append(block)
 test = Ball((50, 50))
 ballList.append(test)
 
+pg.mixer.music.play(loops=-1)
+
 while isRunning == True:
     for event in pg.event.get():
         if event.type == pg.QUIT:
@@ -298,12 +337,15 @@ while isRunning == True:
             if event.key == pg.K_m:
                 if isMuted:
                     isMuted = False
+                    pg.mixer.music.unpause()
                 else:
                     isMuted = True
+                    pg.mixer.music.pause()
 
             if event.key == pg.K_e:
                 for player in playerList:
-                    player.pickup()
+                    if player.char != "dummy":
+                        player.pickup()
 
     screen.fill((0, 0, 0))
 
