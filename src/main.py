@@ -22,9 +22,9 @@ class Player:
         self.isOnGround = False
         self.isGoingUp = False
 
-        self.jumpsfx = pg.mixer.Sound(r'assets\lyd\jump.wav')
-        self.pickupsfx = pg.mixer.Sound(r'assets\lyd\pickup.wav')
-        self.throwsfx = pg.mixer.Sound(r'assets\lyd\throw.wav')
+        self.jumpsfx = pg.mixer.Sound(r'src\assets\lyd\jump.wav')
+        self.pickupsfx = pg.mixer.Sound(r'src\assets\lyd\pickup.wav')
+        self.throwsfx = pg.mixer.Sound(r'src\assets\lyd\throw.wav')
 
         self.rect = pg.Rect(self.pos.x, self.pos.y, self.size.x, self.size.y)
         self.col = pymath.Vector3(255, 255, 255) # temp color
@@ -37,7 +37,7 @@ class Player:
         self.holdingsprites = []
 
         if self.char == "billy" or self.char == "dummy":
-            path = 'assets\\art\\karakterer\\Billy\\billy00'
+            path = 'src\\assets\\art\\karakterer\\Billy\\billy00'
             for i in range(30):
                 if i >= 9:
                     file = path + str(i + 1) + '.png'
@@ -51,8 +51,8 @@ class Player:
 
                 self.holdingsprites.append(pg.image.load(file).convert_alpha())
 
-            self.standingSprite = pg.image.load(r'assets\art\karakterer\Billy\billyStanding.png').convert_alpha()
-            self.airSprite = pg.image.load(r'assets\art\karakterer\Billy\billyAir.png').convert_alpha()
+            self.standingSprite = pg.image.load(r'src\assets\art\karakterer\Billy\billyStanding.png').convert_alpha()
+            self.airSprite = pg.image.load(r'src\assets\art\karakterer\Billy\billyAir.png').convert_alpha()
 
         # rescaling
         for i in range(len(self.runningsprites)):
@@ -213,9 +213,9 @@ class Ball:
         self.size = 10
         self.speed = pymath.Vector2(speed)
 
-        self.bounceSound = pg.mixer.Sound(r'assets\lyd\ballBounce.wav')
+        self.bounceSound = pg.mixer.Sound(r'src\assets\lyd\ballBounce.wav')
 
-        self.image = pg.image.load(r'assets\art\Basic_ball.png').convert_alpha()
+        self.image = pg.image.load(r'src\assets\art\Basic_ball.png').convert_alpha()
         self.image = pg.transform.scale(self.image, (self.size + 9, self.size + 9))
         
         self.boucesLeft = 3
@@ -287,27 +287,60 @@ class Ball:
         screen.blit(self.image, self.rect)
 
 class ParticleSystem:
-    def __init__(self, num, spread, speed, gravity, col):
-        self.maxnum = num
-        self.spread = spread
-        self.startspeed = speed
+    def __init__(self, pos, speed, gravity, spread, col, size, lifetime, spawnrate):
+        self.maxnum = 100
+        self.particleList = []
+        self.lifetime = lifetime
+        self.spawnrate = spawnrate
+        self.currentSpawn = 0
+
+        self.pos = pymath.Vector2(pos)
+        self.speed = pymath.Vector2(speed)
+        self.gravity = gravity
+        self.spread = pymath.Vector2(spread)
+        self.col = list(col)
+        self.size = size
+
+    def tick(self):
+        self.randomNum = random.randrange(0, 100)
+        self.randomNum = self.randomNum / 100
+        print(self.randomNum)
+
+        if len(self.particleList) < self.maxnum:
+            self.currentSpawn += 1
+            if self.currentSpawn >= self.spawnrate:
+                self.currentSpawn = 0
+
+                spread = self.randomNum * self.spread
+                spread = spread[0]
+                self.speed.x = spread - self.spread[0] / 2
+
+                particle = Particle(self.pos, self.speed, self.gravity, self.col, self.size)
+                self.particleList.append(particle)
+
+        for particle in self.particleList:
+            if particle.lifetime >= self.lifetime:
+                self.particleList.remove(particle)
+
+            particle.tick()
+
+class Particle:
+    def __init__(self, pos, speed, gravity, col, size):
+        self.pos = pymath.Vector2(pos)
+        self.speed = pymath.Vector2(speed)
         self.gravity = gravity
         self.col = col
+        self.size = size
+        self.lifetime = 0
         
-        self.particleList = []
-        self.num = 0
-    
+        self.rect = pg.Rect(self.pos.x, self.pos.y, self.size, self.size)
+
     def tick(self):
-        if self.num < self.maxnum:
-            self.spawnParticle()
-            
-        for particle in particleList:
-            particle.centery += self.gravity
-            particle.center
-            pydraw.rect(screen, self.col, particle)
-    
-    def spawnParticle(self):
-        pass
+        self.speed.y += self.gravity
+        self.pos += self.speed
+        self.rect.center = (self.pos.x, self.pos.y)
+        pydraw.rect(screen, self.col, self.rect)
+        self.lifetime += 1
 
 pg.mixer.pre_init(44100, -16, 2, 512)
 pg.init()
@@ -325,7 +358,7 @@ isMuted = True
 
 def load_music():
     x = random.randint(1, 3)
-    y = 'assets\lyd\Music\Juhani Junkala [Retro Game Music Pack] Level ' + str(x) + '.wav'
+    y = r'src\assets\lyd\Music\Juhani Junkala [Retro Game Music Pack] Level ' + str(x) + '.wav'
     pg.mixer.music.load(y)
 
 load_music()
@@ -348,6 +381,8 @@ blockList.append(block)
 
 test = Ball((50, 50))
 ballList.append(test)
+
+particlesystem = ParticleSystem((500, 500), (0, 0), 0, 5, (255, 255, 255), 10, 50, 1)
 
 pg.mixer.music.play(loops=-1)
 
@@ -380,6 +415,8 @@ while isRunning == True:
     
     for ball in ballList:
         ball.tick()
+
+    particlesystem.tick()
 
     pg.display.update()
     clock.tick(FPS)
