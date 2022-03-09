@@ -26,7 +26,7 @@ class Player:
         self.pickupsfx = pg.mixer.Sound(r'src\assets\lyd\pickup.wav')
         self.throwsfx = pg.mixer.Sound(r'src\assets\lyd\throw.wav')
 
-        self.rect = pg.Rect(self.pos.x, self.pos.y, self.size.x, self.size.y)
+        self.rect = pg.Rect(self.pos.x, self.pos.y, self.size.x - 10, self.size.y - 10)
         self.col = pymath.Vector3(255, 255, 255) # temp color
 
         self.loadSprites()
@@ -51,8 +51,8 @@ class Player:
 
                 self.holdingsprites.append(pg.image.load(file).convert_alpha())
 
-            self.standingSprite = pg.image.load(r'src\assets\art\karakterer\Billy\billyStanding.png').convert_alpha()
-            self.airSprite = pg.image.load(r'src\assets\art\karakterer\Billy\billyAir.png').convert_alpha()
+            self.standingSprite = pg.image.load(r'src\assets\art\karakterer\Billy\billy0007.png').convert_alpha()
+            self.airSprite = pg.image.load(r'src\assets\art\karakterer\Billy\billy0055.png').convert_alpha()
 
         # rescaling
         for i in range(len(self.runningsprites)):
@@ -170,6 +170,8 @@ class Player:
         if self.lastMoveDir.x == 1:
             img = pg.transform.flip(img, True, False)
 
+        
+
         return img
 
     def stateMachine(self):
@@ -191,7 +193,7 @@ class Player:
             self.isGoingUp = False
 
     def drawBall(self):
-        ball = Ball((self.pos.x, self.pos.y - self.size.y / 2 -  5))
+        ball = Ball((self.pos.x, self.pos.y - self.size.y / 2 + 5))
         screen.blit(ball.image, ball.rect)
         del ball
 
@@ -304,7 +306,6 @@ class ParticleSystem:
     def tick(self):
         self.randomNum = random.randrange(0, 100)
         self.randomNum = self.randomNum / 100
-        print(self.randomNum)
 
         if len(self.particleList) < self.maxnum:
             self.currentSpawn += 1
@@ -313,9 +314,9 @@ class ParticleSystem:
 
                 spread = self.randomNum * self.spread
                 spread = spread[0]
-                self.speed.x = spread - self.spread[0] / 2
+                tempspeedx = self.speed.x + spread - self.spread[0] / 2
 
-                particle = Particle(self.pos, self.speed, self.gravity, self.col, self.size)
+                particle = Particle(self.pos, (tempspeedx, self.speed.y), self.gravity, self.col, self.size)
                 self.particleList.append(particle)
 
         for particle in self.particleList:
@@ -347,14 +348,16 @@ pg.init()
 
 window = pg.display.Info()
 
-SCREEN_WIDTH = window.current_w - 90
-SCREEN_HEIGHT = window.current_h - 90
+SCREEN_WIDTH = window.current_w
+SCREEN_HEIGHT = window.current_h
 screen = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 clock = pg.time.Clock()
 game_font = pg.font.Font(None, 25)
 isRunning = True
 FPS = 60
 isMuted = True
+
+pg.display.toggle_fullscreen()
 
 def load_music():
     x = random.randint(1, 3)
@@ -367,10 +370,10 @@ blockList = []
 ballList = []
 playerList = []
 
-player = Player((50, 50), (50, 50))
+player = Player((60, 60), (50, 50))
 playerList.append(player)
 
-dummy = Player((50, 50), (500, 50), char="dummy")
+dummy = Player((60, 60), (500, 50), char="dummy")
 playerList.append(dummy)
 
 block = Block((170, 600), (200, 30))
@@ -382,9 +385,7 @@ blockList.append(block)
 test = Ball((50, 50))
 ballList.append(test)
 
-particlesystem = ParticleSystem((500, 500), (0, 0), 0, 5, (255, 255, 255), 10, 50, 1)
-
-pg.mixer.music.play(loops=-1)
+particlesystem = ParticleSystem((500, 500), (10, -10), 1, 5, (255, 255, 255), 10, 50, 1)
 
 while isRunning == True:
     for event in pg.event.get():
@@ -392,13 +393,18 @@ while isRunning == True:
             quit()
 
         if event.type == pg.KEYDOWN:
+            if event.key == pg.K_ESCAPE:
+                quit()
+            if event.key == pg.K_F11:
+                pg.display.toggle_fullscreen() 
+
             if event.key == pg.K_m:
                 if isMuted:
                     isMuted = False
-                    pg.mixer.music.unpause()
+                    pg.mixer.music.play(loops=-1)
                 else:
                     isMuted = True
-                    pg.mixer.music.pause()
+                    pg.mixer.music.stop()
 
             if event.key == pg.K_e:
                 for player in playerList:
