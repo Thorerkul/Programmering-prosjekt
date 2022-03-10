@@ -1,3 +1,4 @@
+from inspect import isfunction
 import sys, random, math
 import pygame as pg
 import pygame.math as pymath
@@ -358,8 +359,7 @@ game_font = pg.font.Font(None, 25)
 isRunning = True
 FPS = 60
 isMuted = True
-
-pg.display.toggle_fullscreen()
+isFullscreen = False
 
 def load_music():
     x = random.randint(1, 3)
@@ -398,6 +398,14 @@ while isRunning == True:
             if event.key == pg.K_ESCAPE:
                 quit()
             if event.key == pg.K_F11:
+                if isFullscreen:
+                    isFullscreen = False
+                    SCREEN_WIDTH = 1920
+                    SCREEN_HEIGHT = 1080
+                else:
+                    isFullscreen = True
+                    SCREEN_WIDTH = window.current_w
+                    SCREEN_HEIGHT = window.current_h
                 pg.display.toggle_fullscreen() 
 
             if event.key == pg.K_m:
@@ -428,5 +436,7 @@ while isRunning == True:
 
     pg.display.update()
     clock.tick(FPS)
+
+    print(isFullscreen)
 
 quit()
