@@ -395,9 +395,10 @@ pg.mixer.pre_init(44100, -16, 2, 512)
 pg.init()
 
 window = pg.display.Info()
+print(window.current_w, window.current_h)
 
-SCREEN_WIDTH = 1536
-SCREEN_HEIGHT = 864
+SCREEN_WIDTH = 1920
+SCREEN_HEIGHT = 1200
 screen = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 clock = pg.time.Clock()
 game_font = pg.font.Font(None, 25)
@@ -440,7 +441,7 @@ while isRunning == True:
             quit()
 
         if event.type == pg.KEYDOWN:
-            if event.key == pg.K_F11:
+            if event.key == pg.K_ESCAPE:
                 quit()
             if event.key == pg.K_F11:
                 if isFullscreen:
