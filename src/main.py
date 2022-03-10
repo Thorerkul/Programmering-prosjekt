@@ -69,6 +69,7 @@ class Player:
         self.gravity()
         self.checkCollisions()
         self.movementHandler()
+        self.selectBall()
 
         self.pos.x += self.speed.x
         self.pos.y += self.speed.y
@@ -128,10 +129,11 @@ class Player:
         if self.hasBall == False:
             for ball in ballList:
                 if self.rect.colliderect(ball):
-                    ballList.remove(ball)
-                    del ball
+                    self.ballType = ball.type
                     self.hasBall = True
                     if isMuted == False: self.pickupsfx.play()
+                    ballList.remove(ball)
+                    del ball
         else:
             mouse_pos = pymath.Vector2(pg.mouse.get_pos())
             dir = pymath.Vector2(mouse_pos.x - self.pos.x, mouse_pos.y - self.pos.y)
@@ -141,7 +143,7 @@ class Player:
             
             dir = (0 - dir[0], 0 - dir[1])
 
-            ball = Ball((self.pos.x, self.pos.y), speed=dir)
+            ball = Ball((self.pos.x, self.pos.y), speed=dir, type=self.ballType)
             ballList.append(ball)
             self.hasBall = False
             if isMuted == False: self.throwsfx.play()
@@ -196,9 +198,25 @@ class Player:
             self.isGoingUp = False
 
     def drawBall(self):
-        ball = Ball((self.pos.x, self.pos.y - self.size.y / 2 + 5))
+        ball = Ball((self.pos.x, self.pos.y - self.size.y / 2 + 5), type=self.ballType)
         screen.blit(ball.image, ball.rect)
         del ball
+
+    def selectBall(self):
+        keys = pg.key.get_pressed()
+        if self.hasBall:
+            if keys[pg.K_1]:
+                self.ballType = "basic"
+            elif keys[pg.K_2]:
+                self.ballType = "ice"
+            elif keys[pg.K_3]:
+                self.ballType = "steel"
+            elif keys[pg.K_4]:
+                self.ballType = "sun"
+            elif keys[pg.K_5]:
+                self.ballType = "nature"
+            elif keys[pg.K_6]:
+                self.ballType = "magic"
 
 class Block:
     def __init__(self, pos, size):
@@ -212,15 +230,27 @@ class Block:
         pydraw.rect(screen, self.col, self.rect)
 
 class Ball:
-    def __init__(self, pos, speed=(0, 0)):
+    def __init__(self, pos, type="basic", speed=(0, 0)):
         self.pos = pymath.Vector2(pos)
         self.col = pymath.Vector3(255, 0, 0)
         self.size = 10
         self.speed = pymath.Vector2(speed)
+        self.type = type
 
         self.bounceSound = pg.mixer.Sound(r'src\assets\lyd\ballBounce.wav')
 
-        self.image = pg.image.load(r'src\assets\art\Basic_ball.png').convert_alpha()
+        if self.type == "basic":
+            self.image = pg.image.load(r'src\assets\art\Basic_ball.png').convert_alpha()
+        elif self.type == "ice":
+            self.image = pg.image.load(r'src\assets\art\ice_ball.png').convert_alpha()
+        elif self.type == "steel":
+            self.image = pg.image.load(r'src\assets\art\steel_ball.png').convert_alpha()
+        elif self.type == "sun":
+            self.image = pg.image.load(r'src\assets\art\Sun_ball.png').convert_alpha()
+        elif self.type == "nature":
+            self.image = pg.image.load(r'src\assets\art\nature_ball.png').convert_alpha()
+        elif self.type == "magic":
+            self.image = pg.image.load(r'src\assets\art\magic_ball.png').convert_alpha()
         self.image = pg.transform.scale(self.image, (self.size + 9, self.size + 9))
         
         self.boucesLeft = 3
@@ -384,7 +414,7 @@ blockList.append(block)
 block = Block((0, SCREEN_HEIGHT - 20), (SCREEN_WIDTH, 100))
 blockList.append(block)
 
-test = Ball((50, 50))
+test = Ball((50, 50), type="ice")
 ballList.append(test)
 
 particlesystem = ParticleSystem((500, 500), (10, -10), 1, 5, (255, 255, 255), 10, 50, 1)
@@ -395,7 +425,7 @@ while isRunning == True:
             quit()
 
         if event.type == pg.KEYDOWN:
-            if event.key == pg.K_ESCAPE:
+            if event.key == pg.K_F11:
                 quit()
             if event.key == pg.K_F11:
                 if isFullscreen:
@@ -436,7 +466,5 @@ while isRunning == True:
 
     pg.display.update()
     clock.tick(FPS)
-
-    print(isFullscreen)
 
 quit()
