@@ -22,6 +22,8 @@ class Player:
         self.isOnGround = False
         self.isGoingUp = False
 
+        self.ballType = ""  
+
         self.jumpsfx = pg.mixer.Sound(r'src\assets\lyd\jump.wav')
         self.pickupsfx = pg.mixer.Sound(r'src\assets\lyd\pickup.wav')
         self.throwsfx = pg.mixer.Sound(r'src\assets\lyd\throw.wav')
@@ -348,8 +350,8 @@ pg.init()
 
 window = pg.display.Info()
 
-SCREEN_WIDTH = window.current_w
-SCREEN_HEIGHT = window.current_h
+SCREEN_WIDTH = 1536
+SCREEN_HEIGHT = 864
 screen = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 clock = pg.time.Clock()
 game_font = pg.font.Font(None, 25)
