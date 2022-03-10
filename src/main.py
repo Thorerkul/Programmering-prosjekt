@@ -265,6 +265,9 @@ class Ball:
         self.isThrown = True
         
         self.rect = pg.Rect(self.pos.x - self.size, self.pos.y - self.size, self.size * 2, self.size * 2)
+
+        if self.type == "soul":
+            self.particlesystem = ParticleSystem(self.pos, (0, 0), -0.1, 1, (128, 0, 255), 5, 500, 1)
         
     def tick(self):
         if self.speed.y < 15:
@@ -328,10 +331,12 @@ class Ball:
         self.rect.centery = self.pos.y
 
         screen.blit(self.image, self.rect)
+        if self.type == "soul":
+            self.particlesystem.tick(self.pos)
 
 class ParticleSystem:
     def __init__(self, pos, speed, gravity, spread, col, size, lifetime, spawnrate):
-        self.maxnum = 100
+        self.maxnum = 10000000000
         self.particleList = []
         self.lifetime = lifetime
         self.spawnrate = spawnrate
@@ -344,7 +349,9 @@ class ParticleSystem:
         self.col = list(col)
         self.size = size
 
-    def tick(self):
+    def tick(self, pos):
+        self.pos = pos
+
         self.randomNum = random.randrange(0, 100)
         self.randomNum = self.randomNum / 100
 
@@ -470,7 +477,7 @@ while isRunning == True:
     for ball in ballList:
         ball.tick()
 
-    particlesystem.tick()
+    particlesystem.tick((500, 500))
 
     pg.display.update()
     clock.tick(FPS)
