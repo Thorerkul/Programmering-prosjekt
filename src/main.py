@@ -219,6 +219,8 @@ class Player:
                 self.ballType = "magic"
             elif keys[pg.K_7]:
                 self.ballType = "soul"
+            elif keys[pg.K_8]:
+                self.ballType = "obsidian"
 
 class Block:
     def __init__(self, pos, size):
@@ -254,7 +256,9 @@ class Ball:
         elif self.type == "magic":
             self.image = pg.image.load(r'src\assets\art\magic_ball.png').convert_alpha()
         elif self.type == "soul":
-            self.image = pg.image.load(r'src\assets\art\magic_ball.png').convert_alpha()
+            self.image = pg.image.load(r'src\assets\art\soul_ball.png').convert_alpha()
+        elif self.type == "obsidian":
+            self.image = pg.image.load(r'src\assets\art\obsidian_ball.png').convert_alpha()
         self.image = pg.transform.scale(self.image, (self.size + 9, self.size + 9))
         
         self.boucesLeft = 3
@@ -385,8 +389,8 @@ pg.init()
 
 window = pg.display.Info()
 
-SCREEN_WIDTH = 512
-SCREEN_HEIGHT = 600
+SCREEN_WIDTH = 1536
+SCREEN_HEIGHT = 864
 screen = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 clock = pg.time.Clock()
 game_font = pg.font.Font(None, 25)
