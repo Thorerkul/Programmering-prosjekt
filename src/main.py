@@ -270,6 +270,7 @@ class Ball:
             self.particlesystem = ParticleSystem(self.pos, (0, 0), -0.1, 1, (128, 0, 255), 5, 500, 1)
         
     def tick(self):
+        self.specialUpdate()
         if self.speed.y < 15:
             self.speed.y += 0.5
         for block in blockList:
@@ -334,6 +335,25 @@ class Ball:
         if self.type == "soul":
             self.particlesystem.tick(self.pos)
 
+    def specialUpdate(self):
+        if self.type == "soul":
+            if self.isThrown:
+                max = 0
+                low = 0
+                for player in playerList:
+                    pos = self.pos.y - player.pos.y
+                    if pos > 50 or pos < -50:
+                        if pos > max: max = pos
+                        if pos < low: low = pos
+
+                if 0 - low > max:
+                    if self.speed.y < 5:
+                        self.speed.y += 2
+                else:
+                    if self.speed.y > 5:
+                        self.speed.y -= 2
+
+
 class ParticleSystem:
     def __init__(self, pos, speed, gravity, spread, col, size, lifetime, spawnrate):
         self.maxnum = 10000000000
@@ -397,15 +417,16 @@ pg.init()
 window = pg.display.Info()
 print(window.current_w, window.current_h)
 
-SCREEN_WIDTH = 1920
-SCREEN_HEIGHT = 1200
+SCREEN_WIDTH = 1536
+SCREEN_HEIGHT = 864
 screen = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 clock = pg.time.Clock()
 game_font = pg.font.Font(None, 25)
 isRunning = True
 FPS = 60
 isMuted = True
-isFullscreen = False
+isFullscreen = True
+pg.display.toggle_fullscreen() 
 
 def load_music():
     x = random.randint(1, 3)
