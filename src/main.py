@@ -57,6 +57,25 @@ class Player:
             self.standingSprite = pg.image.load(r'src\assets\art\karakterer\Billy\billy0007.png').convert_alpha()
             self.airSprite = pg.image.load(r'src\assets\art\karakterer\Billy\billy0055.png').convert_alpha()
 
+        if self.char == "bald" or self.char == "dummy":
+            path = 'src\\assets\\art\\karakterer\\BaldGuy\\baldguy'
+            for i in range(30):
+                if i >= 9:
+                    file = path + '00' + str(i + 1) + '.png'
+                else:
+                    file = path + '000' + str(i + 1) + '.png'
+
+                print(file, i)
+                self.runningsprites.append(pg.image.load(file).convert_alpha())
+
+            for i in range(30):
+                file = path + str(i + 32) + '.png'
+
+                self.holdingsprites.append(pg.image.load(file).convert_alpha())
+
+            self.standingSprite = pg.image.load(r'src\assets\art\karakterer\BaldGuy\baldguy0007.png').convert_alpha()
+            self.airSprite = pg.image.load(r'src\assets\art\karakterer\BaldGuy\baldguy0055.png').convert_alpha()
+
         # rescaling
         for i in range(len(self.runningsprites)):
             self.runningsprites[i] = pg.transform.scale(self.runningsprites[i], (int(self.size.x), int(self.size.y)))
@@ -439,7 +458,7 @@ blockList = []
 ballList = []
 playerList = []
 
-player = Player((60, 60), (50, 50))
+player = Player((60, 60), (50, 50), char="bald")
 playerList.append(player)
 
 dummy = Player((60, 60), (500, 50), char="dummy")
