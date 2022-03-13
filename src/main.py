@@ -57,7 +57,7 @@ class Player:
             self.standingSprite = pg.image.load(r'src\assets\art\karakterer\Billy\billy0007.png').convert_alpha()
             self.airSprite = pg.image.load(r'src\assets\art\karakterer\Billy\billy0055.png').convert_alpha()
 
-        if self.char == "bald" or self.char == "dummy":
+        if self.char == "bald":
             path = 'src\\assets\\art\\karakterer\\BaldGuy\\baldguy'
             for i in range(30):
                 if i >= 9:
@@ -65,7 +65,10 @@ class Player:
                 else:
                     file = path + '000' + str(i + 1) + '.png'
 
-                print(file, i + 1)
+                if i == 19:
+                    file = 'src\\assets\\art\\karakterer\\BaldGuy\\baldguy0030.png'
+
+                print(file)
                 self.runningsprites.append(pg.image.load(file).convert_alpha())
 
             for i in range(30):
@@ -263,21 +266,21 @@ class Ball:
         self.bounceSound = pg.mixer.Sound(r'src\assets\lyd\ballBounce.wav')
 
         if self.type == "basic":
-            self.image = pg.image.load(r'src\assets\art\Basic_ball.png').convert_alpha()
+            self.image = pg.image.load(r'src\assets\art\balls\Basic_ball.png').convert_alpha()
         elif self.type == "ice":
-            self.image = pg.image.load(r'src\assets\art\ice_ball.png').convert_alpha()
+            self.image = pg.image.load(r'src\assets\art\balls\ice_ball.png').convert_alpha()
         elif self.type == "steel":
-            self.image = pg.image.load(r'src\assets\art\steel_ball.png').convert_alpha()
+            self.image = pg.image.load(r'src\assets\art\balls\steel_ball.png').convert_alpha()
         elif self.type == "sun":
-            self.image = pg.image.load(r'src\assets\art\Sun_ball.png').convert_alpha()
+            self.image = pg.image.load(r'src\assets\art\balls\Sun_ball.png').convert_alpha()
         elif self.type == "nature":
-            self.image = pg.image.load(r'src\assets\art\nature_ball.png').convert_alpha()
+            self.image = pg.image.load(r'src\assets\art\balls\nature_ball.png').convert_alpha()
         elif self.type == "magic":
-            self.image = pg.image.load(r'src\assets\art\magic_ball.png').convert_alpha()
+            self.image = pg.image.load(r'src\assets\art\balls\magic_ball.png').convert_alpha()
         elif self.type == "soul":
-            self.image = pg.image.load(r'src\assets\art\soul_ball.png').convert_alpha()
+            self.image = pg.image.load(r'src\assets\art\balls\soul_ball.png').convert_alpha()
         elif self.type == "obsidian":
-            self.image = pg.image.load(r'src\assets\art\obsidian_ball.png').convert_alpha()
+            self.image = pg.image.load(r'src\assets\art\balls\obsidian_ball.png').convert_alpha()
         self.image = pg.transform.scale(self.image, (self.size + 9, self.size + 9))
         
         self.boucesLeft = 3
