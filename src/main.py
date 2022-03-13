@@ -65,7 +65,7 @@ class Player:
                 else:
                     file = path + '000' + str(i + 1) + '.png'
 
-                print(file, i)
+                print(file, i + 1)
                 self.runningsprites.append(pg.image.load(file).convert_alpha())
 
             for i in range(30):
