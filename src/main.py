@@ -1,5 +1,4 @@
 import sys, random, math
-from numpy import False_
 import pygame as pg
 import pygame.math as pymath
 import pygame.draw as pydraw
@@ -29,9 +28,9 @@ class Player:
 
         self.ballType = ""  
 
-        self.jumpsfx = pg.mixer.Sound(r'src\assets\lyd\jump.wav')
-        self.pickupsfx = pg.mixer.Sound(r'src\assets\lyd\pickup.wav')
-        self.throwsfx = pg.mixer.Sound(r'src\assets\lyd\throw.wav')
+        self.jumpsfx = pg.mixer.Sound(r'assets\lyd\jump.wav')
+        self.pickupsfx = pg.mixer.Sound(r'assets\lyd\pickup.wav')
+        self.throwsfx = pg.mixer.Sound(r'assets\lyd\throw.wav')
 
         self.rect = pg.Rect(self.pos.x, self.pos.y, self.size.x - 10, self.size.y - 10)
         self.col = pymath.Vector3(255, 255, 255) # temp color
@@ -44,7 +43,7 @@ class Player:
         self.holdingsprites = []
 
         if self.char == "billy" or self.char == "dummy":
-            path = 'src\\assets\\art\\karakterer\\Billy\\billy00'
+            path = 'assets\\art\\karakterer\\Billy\\billy00'
             for i in range(30):
                 if i >= 9:
                     file = path + str(i + 1) + '.png'
@@ -58,11 +57,11 @@ class Player:
 
                 self.holdingsprites.append(pg.image.load(file).convert_alpha())
 
-            self.standingSprite = pg.image.load(r'src\assets\art\karakterer\Billy\billy0007.png').convert_alpha()
-            self.airSprite = pg.image.load(r'src\assets\art\karakterer\Billy\billy0055.png').convert_alpha()
+            self.standingSprite = pg.image.load(r'assets\art\karakterer\Billy\billy0007.png').convert_alpha()
+            self.airSprite = pg.image.load(r'assets\art\karakterer\Billy\billy0055.png').convert_alpha()
 
         if self.char == "bald":
-            path = 'src\\assets\\art\\karakterer\\BaldGuy\\baldguy'
+            path = 'assets\\art\\karakterer\\BaldGuy\\baldguy'
             for i in range(30):
                 if i >= 9:
                     file = path + '00' + str(i + 1) + '.png'
@@ -70,7 +69,7 @@ class Player:
                     file = path + '000' + str(i + 1) + '.png'
 
                 if i == 19:
-                    file = 'src\\assets\\art\\karakterer\\BaldGuy\\baldguy0030.png'
+                    file = 'assets\\art\\karakterer\\BaldGuy\\baldguy0030.png'
 
                 print(file)
                 self.runningsprites.append(pg.image.load(file).convert_alpha())
@@ -80,8 +79,8 @@ class Player:
 
                 self.holdingsprites.append(pg.image.load(file).convert_alpha())
 
-            self.standingSprite = pg.image.load(r'src\assets\art\karakterer\BaldGuy\baldguy0007.png').convert_alpha()
-            self.airSprite = pg.image.load(r'src\assets\art\karakterer\BaldGuy\baldguy0055.png').convert_alpha()
+            self.standingSprite = pg.image.load(r'assets\art\karakterer\BaldGuy\baldguy0007.png').convert_alpha()
+            self.airSprite = pg.image.load(r'assets\art\karakterer\BaldGuy\baldguy0055.png').convert_alpha()
 
         # rescaling
         for i in range(len(self.runningsprites)):
@@ -116,7 +115,7 @@ class Player:
                 self.speed.x = 0 - self.max_speed
                 self.lastMoveDir.x = -1
             else:
-                self.speed.x = 0
+                self.speed.x /= 1.9
             if keys[pg.K_d]:
                 self.speed.x = self.max_speed
                 self.lastMoveDir.x = 1
@@ -126,6 +125,9 @@ class Player:
                 if isMuted == False: self.jumpsfx.play()
             
             self.prev_keys = pg.key.get_pressed()
+            
+        if self.char == "dummy":
+            self.speed.x /= 2
 
     def checkCollisions(self):
         for block in blockList:
@@ -204,7 +206,7 @@ class Player:
                 if self.hasBall: self.drawBall()
             else:
                 img = self.runningsprites[self.current_frame]
-            if self.speed.x == 0:
+            if self.speed.x <= 0.1 and self.speed.x >= -0.1:
                 img = self.standingSprite
                 if self.hasBall:
                     img = self.airSprite
@@ -223,6 +225,8 @@ class Player:
         return img
 
     def stateMachine(self):
+        if self.char == "billy":
+            print(self.speed.x)
         for block in blockList:
             if self.rect.bottom + 3 <= block.rect.top:
                 self.isOnGround = True
@@ -274,12 +278,17 @@ class Player:
 
     def HpHandler(self):
         for ball in ballList:
-            if self.rect.colliderect(ball):
-                if ball.isThrown:
-                    if ball.type == "steel":
-                        self.speed.x = ball.speed.x / 5
-                    if self.hasBall == False:
-                        self.hp -= 1
+            if ball.lifetime >= 3:
+                if self.rect.colliderect(ball):
+                    if ball.isThrown:
+                        if ball.type == "steel":
+                            self.speed.x = ball.speed.x / 2
+                            self.hp -= 5
+                        elif ball.type == "obsidian":
+                            self.speed.x = ball.speed.x / 1.1
+                            self.hp -= 0.5
+                        else:
+                            self.hp -= 1
 
         text = str(self.hp) + " / " + str(self.maxhp)
         surf = game_font.render(text, True, (255, 255, 255))
@@ -329,25 +338,26 @@ class Ball:
         self.speed = pymath.Vector2(speed)
         self.type = type
         self.weight = 0.5
+        self.lifetime = 0
 
-        self.bounceSound = pg.mixer.Sound(r'src\assets\lyd\ballBounce.wav')
+        self.bounceSound = pg.mixer.Sound(r'assets\lyd\ballBounce.wav')
 
         if self.type == "basic":
-            self.image = pg.image.load(r'src\assets\art\balls\Basic_ball.png').convert_alpha()
+            self.image = pg.image.load(r'assets\art\balls\Basic_ball.png').convert_alpha()
         elif self.type == "ice":
-            self.image = pg.image.load(r'src\assets\art\balls\ice_ball.png').convert_alpha()
+            self.image = pg.image.load(r'assets\art\balls\ice_ball.png').convert_alpha()
         elif self.type == "steel":
-            self.image = pg.image.load(r'src\assets\art\balls\steel_ball.png').convert_alpha()
+            self.image = pg.image.load(r'assets\art\balls\steel_ball.png').convert_alpha()
         elif self.type == "sun":
-            self.image = pg.image.load(r'src\assets\art\balls\Sun_ball.png').convert_alpha()
+            self.image = pg.image.load(r'assets\art\balls\Sun_ball.png').convert_alpha()
         elif self.type == "nature":
-            self.image = pg.image.load(r'src\assets\art\balls\nature_ball.png').convert_alpha()
+            self.image = pg.image.load(r'assets\art\balls\nature_ball.png').convert_alpha()
         elif self.type == "magic":
-            self.image = pg.image.load(r'src\assets\art\balls\magic_ball.png').convert_alpha()
+            self.image = pg.image.load(r'assets\art\balls\magic_ball.png').convert_alpha()
         elif self.type == "soul":
-            self.image = pg.image.load(r'src\assets\art\balls\soul_ball.png').convert_alpha()
+            self.image = pg.image.load(r'assets\art\balls\soul_ball.png').convert_alpha()
         elif self.type == "obsidian":
-            self.image = pg.image.load(r'src\assets\art\balls\obsidian_ball.png').convert_alpha()
+            self.image = pg.image.load(r'assets\art\balls\obsidian_ball.png').convert_alpha()
         self.image = pg.transform.scale(self.image, (self.size + 9, self.size + 9))
         
         self.boucesLeft = 3
@@ -359,6 +369,7 @@ class Ball:
             self.particlesystem = ParticleSystem(self.pos, (0, 0), -0.005, 1, (128, 0, 255), 5, 500, 1)
         
     def tick(self):
+        self.lifetime += 1
         self.specialUpdate()
         if self.speed.y < 15:
             self.speed.y += self.weight
@@ -381,7 +392,7 @@ class Ball:
 
                         self.rect.centerx = self.pos.x
                         self.rect.centery = self.pos.y
-                    self.speed.y = 0 - self.speed.y / self.weight * 3
+                    self.speed.y = 5
                     self.speed.x /= 1.1
                     if isMuted == False: self.bounceSound.play()
                     self.boucesLeft -= 1
@@ -520,8 +531,8 @@ pg.init()
 
 window = pg.display.Info()
 
-SCREEN_WIDTH = window.current_w
-SCREEN_HEIGHT = window.current_h
+SCREEN_WIDTH = 1024
+SCREEN_HEIGHT = 512
 screen = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 clock = pg.time.Clock()
 game_font = pg.font.Font(None, 25)
@@ -529,17 +540,17 @@ isRunning = True
 FPS = 60
 isMuted = True
 isFullscreen = True
-pg.display.toggle_fullscreen() 
+#pg.display.toggle_fullscreen() 
 
 def load_music():
     x = random.randint(1, 3)
-    y = r'src\assets\lyd\Music\Juhani Junkala [Retro Game Music Pack] Level ' + str(x) + '.wav'
+    y = r'assets\lyd\Music\Juhani Junkala [Retro Game Music Pack] Level ' + str(x) + '.wav'
     pg.mixer.music.load(y)
 
 load_music()
 
-bgimg = pg.image.load(r'src\assets\art\bg\hell.png').convert_alpha()
-bgimg = pg.transform.scale(bgimg, (window.current_w, window.current_h))
+bgimg = pg.image.load(r'assets\art\bg\hell.png').convert_alpha()
+bgimg = pg.transform.scale(bgimg, (SCREEN_WIDTH, SCREEN_HEIGHT))
 bgrect = pg.Rect(0, 0, window.current_w, window.current_h)
 
 blockList = []
