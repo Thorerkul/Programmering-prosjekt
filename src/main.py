@@ -19,10 +19,13 @@ class Player:
         self.char = char
         self.lastMoveDir = pymath.Vector2(0, 0)
         self.hasBall = False
+        self.prev_hasBall = False
         self.isOnGround = False
         self.isGoingUp = False
         self.weight = 0.5
         self.defaultWeight = 0.5
+        self.maxhp = 100
+        self.hp = self.maxhp
 
         self.ballType = ""  
 
@@ -94,6 +97,7 @@ class Player:
         self.movementHandler()
         self.selectBall()
         self.ballAction()
+        self.HpHandler()
 
         self.pos.x += self.speed.x
         self.pos.y += self.speed.y
@@ -103,6 +107,7 @@ class Player:
 
         screen.blit(self.animation(), self.rect)
         self.canJump = False
+        self.prev_hasBall = self.hasBall
 
     def movementHandler(self):
         if self.char == "billy":
@@ -266,6 +271,20 @@ class Player:
             self.weight = 2
         if self.ballType == "steel" and self.hasBall:
             self.weight = 1.25
+
+    def HpHandler(self):
+        for ball in ballList:
+            if self.rect.colliderect(ball):
+                if ball.isThrown:
+                    if ball.type == "steel":
+                        self.speed.x = ball.speed.x / 5
+                    if self.hasBall == False:
+                        self.hp -= 1
+
+        text = str(self.hp) + " / " + str(self.maxhp)
+        surf = game_font.render(text, True, (255, 255, 255))
+        rect = surf.get_rect(center = (self.pos.x, self.pos.y - 50))
+        screen.blit(surf, rect)
 
 class Block:
     def __init__(self, pos, size, isMoving, isX=True, slide=False):
