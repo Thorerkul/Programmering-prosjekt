@@ -28,9 +28,9 @@ class Player:
 
         self.ballType = ""  
 
-        self.jumpsfx = pg.mixer.Sound(r'assets\lyd\jump.wav')
-        self.pickupsfx = pg.mixer.Sound(r'assets\lyd\pickup.wav')
-        self.throwsfx = pg.mixer.Sound(r'assets\lyd\throw.wav')
+        self.jumpsfx = pg.mixer.Sound(r'src\assets\lyd\jump.wav')
+        self.pickupsfx = pg.mixer.Sound(r'src\assets\lyd\pickup.wav')
+        self.throwsfx = pg.mixer.Sound(r'src\assets\lyd\throw.wav')
 
         self.rect = pg.Rect(self.pos.x, self.pos.y, self.size.x - 10, self.size.y - 10)
         self.col = pymath.Vector3(255, 255, 255) # temp color
@@ -43,7 +43,7 @@ class Player:
         self.holdingsprites = []
 
         if self.char == "billy" or self.char == "dummy":
-            path = 'assets\\art\\karakterer\\Billy\\billy00'
+            path = 'src\\assets\\art\\karakterer\\Billy\\billy00'
             for i in range(30):
                 if i >= 9:
                     file = path + str(i + 1) + '.png'
@@ -57,11 +57,11 @@ class Player:
 
                 self.holdingsprites.append(pg.image.load(file).convert_alpha())
 
-            self.standingSprite = pg.image.load(r'assets\art\karakterer\Billy\billy0007.png').convert_alpha()
-            self.airSprite = pg.image.load(r'assets\art\karakterer\Billy\billy0055.png').convert_alpha()
+            self.standingSprite = pg.image.load(r'src\assets\art\karakterer\Billy\billy0007.png').convert_alpha()
+            self.airSprite = pg.image.load(r'src\assets\art\karakterer\Billy\billy0055.png').convert_alpha()
 
         if self.char == "bald":
-            path = 'assets\\art\\karakterer\\BaldGuy\\baldguy'
+            path = 'src\\assets\\art\\karakterer\\BaldGuy\\baldguy'
             for i in range(30):
                 if i >= 9:
                     file = path + '00' + str(i + 1) + '.png'
@@ -69,7 +69,7 @@ class Player:
                     file = path + '000' + str(i + 1) + '.png'
 
                 if i == 19:
-                    file = 'assets\\art\\karakterer\\BaldGuy\\baldguy0030.png'
+                    file = 'src\\assets\\art\\karakterer\\BaldGuy\\baldguy0030.png'
 
                 print(file)
                 self.runningsprites.append(pg.image.load(file).convert_alpha())
@@ -79,8 +79,8 @@ class Player:
 
                 self.holdingsprites.append(pg.image.load(file).convert_alpha())
 
-            self.standingSprite = pg.image.load(r'assets\art\karakterer\BaldGuy\baldguy0007.png').convert_alpha()
-            self.airSprite = pg.image.load(r'assets\art\karakterer\BaldGuy\baldguy0055.png').convert_alpha()
+            self.standingSprite = pg.image.load(r'src\assets\art\karakterer\BaldGuy\baldguy0007.png').convert_alpha()
+            self.airSprite = pg.image.load(r'src\assets\art\karakterer\BaldGuy\baldguy0055.png').convert_alpha()
 
         # rescaling
         for i in range(len(self.runningsprites)):
@@ -225,8 +225,6 @@ class Player:
         return img
 
     def stateMachine(self):
-        if self.char == "billy":
-            print(self.speed.x)
         for block in blockList:
             if self.rect.bottom + 3 <= block.rect.top:
                 self.isOnGround = True
@@ -290,7 +288,7 @@ class Player:
                         else:
                             self.hp -= 1
 
-        text = str(self.hp) + " / " + str(self.maxhp)
+        text = str(int(self.hp)) + " / " + str(self.maxhp)
         surf = game_font.render(text, True, (255, 255, 255))
         rect = surf.get_rect(center = (self.pos.x, self.pos.y - 50))
         screen.blit(surf, rect)
@@ -340,24 +338,24 @@ class Ball:
         self.weight = 0.5
         self.lifetime = 0
 
-        self.bounceSound = pg.mixer.Sound(r'assets\lyd\ballBounce.wav')
+        self.bounceSound = pg.mixer.Sound(r'src\assets\lyd\ballBounce.wav')
 
         if self.type == "basic":
-            self.image = pg.image.load(r'assets\art\balls\Basic_ball.png').convert_alpha()
+            self.image = pg.image.load(r'src\assets\art\balls\Basic_ball.png').convert_alpha()
         elif self.type == "ice":
-            self.image = pg.image.load(r'assets\art\balls\ice_ball.png').convert_alpha()
+            self.image = pg.image.load(r'src\assets\art\balls\ice_ball.png').convert_alpha()
         elif self.type == "steel":
-            self.image = pg.image.load(r'assets\art\balls\steel_ball.png').convert_alpha()
+            self.image = pg.image.load(r'src\assets\art\balls\steel_ball.png').convert_alpha()
         elif self.type == "sun":
-            self.image = pg.image.load(r'assets\art\balls\Sun_ball.png').convert_alpha()
+            self.image = pg.image.load(r'src\assets\art\balls\Sun_ball.png').convert_alpha()
         elif self.type == "nature":
-            self.image = pg.image.load(r'assets\art\balls\nature_ball.png').convert_alpha()
+            self.image = pg.image.load(r'src\assets\art\balls\nature_ball.png').convert_alpha()
         elif self.type == "magic":
-            self.image = pg.image.load(r'assets\art\balls\magic_ball.png').convert_alpha()
+            self.image = pg.image.load(r'src\assets\art\balls\magic_ball.png').convert_alpha()
         elif self.type == "soul":
-            self.image = pg.image.load(r'assets\art\balls\soul_ball.png').convert_alpha()
+            self.image = pg.image.load(r'src\assets\art\balls\soul_ball.png').convert_alpha()
         elif self.type == "obsidian":
-            self.image = pg.image.load(r'assets\art\balls\obsidian_ball.png').convert_alpha()
+            self.image = pg.image.load(r'src\assets\art\balls\obsidian_ball.png').convert_alpha()
         self.image = pg.transform.scale(self.image, (self.size + 9, self.size + 9))
         
         self.boucesLeft = 3
@@ -540,16 +538,17 @@ isRunning = True
 FPS = 60
 isMuted = True
 isFullscreen = True
+pg.mixer.music.set_volume(0.1)
 #pg.display.toggle_fullscreen() 
 
 def load_music():
     x = random.randint(1, 3)
-    y = r'assets\lyd\Music\Juhani Junkala [Retro Game Music Pack] Level ' + str(x) + '.wav'
+    y = r'src\assets\lyd\Music\Juhani Junkala [Retro Game Music Pack] Level ' + str(x) + '.wav'
     pg.mixer.music.load(y)
 
 load_music()
 
-bgimg = pg.image.load(r'assets\art\bg\hell.png').convert_alpha()
+bgimg = pg.image.load(r'src\assets\art\bg\hell.png').convert_alpha()
 bgimg = pg.transform.scale(bgimg, (SCREEN_WIDTH, SCREEN_HEIGHT))
 bgrect = pg.Rect(0, 0, window.current_w, window.current_h)
 
