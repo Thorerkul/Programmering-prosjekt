@@ -7,6 +7,59 @@ def quit():
     pg.quit()
     sys.exit()
 
+def startGame(map):
+    global player, floor, test, bgimg, bgrect
+    if map == "empty":
+        bgimg = pg.image.load(r'src\assets\art\bg\space.png').convert_alpha()
+        bgimg = pg.transform.scale(bgimg, (SCREEN_WIDTH, SCREEN_HEIGHT))
+        bgrect = pg.Rect(0, 0, window.current_w, window.current_h)
+
+        player = Player((60, 60), (50, 50))
+        playerList.append(player)
+
+        floor = Block((0, SCREEN_HEIGHT - 20), (SCREEN_WIDTH, 100), False)
+
+        test = Ball((50, 50), type="ice")
+        ballList.append(test)
+
+    if map == "editor":
+        bgimg = pg.image.load(r'src\assets\art\bg\white.png').convert_alpha()
+        bgimg = pg.transform.scale(bgimg, (SCREEN_WIDTH, SCREEN_HEIGHT))
+        bgrect = pg.Rect(0, 0, window.current_w, window.current_h)
+
+        player = Player((60, 60), (50, 50))
+        playerList.append(player)
+
+        floor = Block((0, SCREEN_HEIGHT - 20), (SCREEN_WIDTH, 100), False)
+
+        test = Ball((50, 50), type="ice")
+        ballList.append(test)
+
+        isInEditor = True
+
+    if map == "default":
+        global dummy, block, particlesystem
+
+        bgimg = pg.image.load(r'src\assets\art\bg\hell.png').convert_alpha()
+        bgimg = pg.transform.scale(bgimg, (SCREEN_WIDTH, SCREEN_HEIGHT))
+        bgrect = pg.Rect(0, 0, window.current_w, window.current_h)
+
+        player = Player((60, 60), (50, 50))
+        playerList.append(player)
+
+        dummy = Player((60, 60), (500, 50), char="dummy")
+        playerList.append(dummy)
+
+        block = Block((170, 700), (200, 30), True, isX=False)
+        blockList.append(block)
+
+        floor = Block((0, SCREEN_HEIGHT - 20), (SCREEN_WIDTH, 100), False)
+
+        test = Ball((50, 50), type="ice")
+        ballList.append(test)
+
+        particlesystem = ParticleSystem((500, 500), (10, -10), 1, 5, (255, 255, 255), 10, 50, 1)
+
 class Player:
     def __init__(self, size, pos, char="billy"):
         self.pos = pymath.Vector2(pos)
@@ -538,6 +591,7 @@ isRunning = True
 FPS = 60
 isMuted = True
 isFullscreen = True
+isInEditor = False
 pg.mixer.music.set_volume(0.1)
 #pg.display.toggle_fullscreen() 
 
@@ -548,29 +602,11 @@ def load_music():
 
 load_music()
 
-bgimg = pg.image.load(r'src\assets\art\bg\hell.png').convert_alpha()
-bgimg = pg.transform.scale(bgimg, (SCREEN_WIDTH, SCREEN_HEIGHT))
-bgrect = pg.Rect(0, 0, window.current_w, window.current_h)
-
 blockList = []
 ballList = []
 playerList = []
 
-player = Player((60, 60), (50, 50))
-playerList.append(player)
-
-dummy = Player((60, 60), (500, 50), char="dummy")
-playerList.append(dummy)
-
-block = Block((170, 700), (200, 30), True, isX=False)
-blockList.append(block)
-
-floor = Block((0, SCREEN_HEIGHT - 20), (SCREEN_WIDTH, 100), False)
-
-test = Ball((50, 50), type="ice")
-ballList.append(test)
-
-particlesystem = ParticleSystem((500, 500), (10, -10), 1, 5, (255, 255, 255), 10, 50, 1)
+startGame("editor")
 
 while isRunning == True:
     for event in pg.event.get():
@@ -615,8 +651,6 @@ while isRunning == True:
     
     for ball in ballList:
         ball.tick()
-
-    particlesystem.tick((500, 500))
 
     pg.display.update()
     clock.tick(FPS)
