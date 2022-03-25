@@ -23,7 +23,8 @@ def startGame(map):
         ballList.append(test)
 
     if map == "editor":
-        bgimg = pg.image.load(r'src\assets\art\bg\white.png').convert_alpha()
+        global editor, isInEditor
+        bgimg = pg.image.load(r'src\assets\art\bg\black.png').convert_alpha()
         bgimg = pg.transform.scale(bgimg, (SCREEN_WIDTH, SCREEN_HEIGHT))
         bgrect = pg.Rect(0, 0, window.current_w, window.current_h)
 
@@ -36,6 +37,7 @@ def startGame(map):
         ballList.append(test)
 
         isInEditor = True
+        editor = EditorHandler()
 
     if map == "default":
         global dummy, block, particlesystem
@@ -577,6 +579,36 @@ class Particle:
         pydraw.rect(screen, self.col, self.rect)
         self.lifetime += 1
 
+class EditorHandler:
+    def __init__(self):
+        self.mouse = pymath.Vector2(pg.mouse.get_pos())
+        self.mousepress = pg.mouse.get_pressed(3)
+        self.prevMousepress = self.mousepress
+        self.hasClicked = [False, False, False]
+        self.clickpos = [pymath.Vector2(0, 0), pymath.Vector2(0, 0)]
+
+    def tick(self):
+        global blockList
+        self.mouse = pymath.Vector2(pg.mouse.get_pos())
+        self.mousepress = [pg.mouse.get_pressed(3)]
+        self.mousepress = self.mousepress[0]
+
+        if self.mousepress[0] != self.prevMousepress[0] and self.mousepress[0] == True:
+            if self.hasClicked[0]:
+                self.hasClicked[0] = False
+                self.clickpos[1] = pymath.Vector2(self.mouse.x, self.mouse.y)
+
+                print("yes")
+                block = Block(self.clickpos[0], (self.clickpos[0].x - self.clickpos[1].x, self.clickpos[0].y - self.clickpos[1].y), False)
+                blockList.append(block)
+                print("yes 2")
+            else:
+                self.hasClicked[0] = True
+                self.clickpos[0] = pymath.Vector2(self.mouse.x, self.mouse.y)
+
+        print(self.mouse, self.mousepress[0], self.prevMousepress[0], self.hasClicked[0], self.clickpos, blockList)
+        self.prevMousepress = self.mousepress
+
 pg.mixer.pre_init(44100, -16, 2, 512)
 pg.init()
 
@@ -643,14 +675,18 @@ while isRunning == True:
     screen.fill((0, 0, 0))
     screen.blit(bgimg, bgrect)
 
-    for block in blockList:
-        block.tick()
-
     for player in playerList:
         player.tick()
     
     for ball in ballList:
         ball.tick()
+
+    if isInEditor:
+        editor.tick()
+
+    for block in blockList:
+        block.tick()
+        print(block.col)
 
     pg.display.update()
     clock.tick(FPS)
