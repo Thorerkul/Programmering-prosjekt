@@ -17,7 +17,7 @@ def startGame(map):
         player = Player((60, 60), (50, 50))
         playerList.append(player)
 
-        floor = Block((0, SCREEN_HEIGHT - 20), (SCREEN_WIDTH, 100), False)
+        floor = Block((0, SCREEN_HEIGHT - 20), (SCREEN_WIDTH, 100))
 
         test = Ball((50, 50), type="ice")
         ballList.append(test)
@@ -31,7 +31,7 @@ def startGame(map):
         player = Player((60, 60), (50, 50))
         playerList.append(player)
 
-        floor = Block((0, SCREEN_HEIGHT - 20), (SCREEN_WIDTH, 100), False)
+        floor = Block((0, SCREEN_HEIGHT - 20), (SCREEN_WIDTH, 100))
 
         test = Ball((50, 50), type="ice")
         ballList.append(test)
@@ -40,7 +40,7 @@ def startGame(map):
         editor = EditorHandler()
 
     if map == "default":
-        global dummy, block, particlesystem, isInEditor
+        global dummy, particlesystem, isInEditor
 
         bgimg = pg.image.load(r'src\assets\art\bg\hell.png').convert_alpha()
         bgimg = pg.transform.scale(bgimg, (SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -52,10 +52,10 @@ def startGame(map):
         dummy = Player((60, 60), (500, 50), char="dummy")
         playerList.append(dummy)
 
-        block = Block((170, 700), (200, 30), True, isX=False)
-        blockList.append(block)
+        #block = Block((500, 400), (200, 30))
+        #blockList.append(block)
 
-        floor = Block((0, SCREEN_HEIGHT - 20), (SCREEN_WIDTH, 100), False)
+        floor = Block((0, SCREEN_HEIGHT - 20), (SCREEN_WIDTH, 100))
 
         test = Ball((50, 50), type="ice")
         ballList.append(test)
@@ -64,9 +64,29 @@ def startGame(map):
         isInEditor = True
 
 def loadSaves():
-    global level
-    level = open('src\\assets\saves\saves.txt')
-    print(level.read())
+    global levelr, levela, blockList
+    levela = open('src\\assets\saves\saves.txt', 'a')
+    levelr = open('src\\assets\saves\saves.txt', 'r')
+
+    x = 0
+    while True:
+        content = levelr.readline()
+        if content != '':
+            temp = ''
+            for char in content:
+                if char == ']':
+                    break
+                temp = temp + char
+            temp = temp.replace('[', '')
+            temp = temp.split(', ')
+            for i in range(len(temp)):
+                temp[i] = float(temp[i])
+                temp[i] = int(temp[i])
+            block = Block((temp[0], temp[1]), (temp[2], temp[3]))
+            blockList.append(block)
+            print(block.pos.y)
+        else:
+            break
 
 class Player:
     def __init__(self, size, pos, char="billy"):
@@ -196,16 +216,6 @@ class Player:
                 if self.rect.centery <= block.rect.centery:
                     self.speed.y = -0.25
                     self.canJump = True
-                    if block.isMoving:
-                        if block.isX:
-                            if block.slide == False:
-                                if block.isGoingRight:
-                                    self.pos.x += 2
-                                else:
-                                    self.pos.x -= 2
-                        else:
-                            if block.isGoingRight == False:
-                                self.pos.y -= 2
                 else:
                     self.speed.y = 2
                     
@@ -355,35 +365,14 @@ class Player:
         screen.blit(surf, rect)
 
 class Block:
-    def __init__(self, pos, size, isMoving, isX=True, slide=False):
+    def __init__(self, pos, size):
         self.pos = pymath.Vector2(pos)
         self.size = pymath.Vector2(size)
         self.col = pymath.Vector3(128, 128, 128) # temp color
-        self.isMoving = isMoving
-        if self.isMoving:
-            self.isX = isX
-            self.slide = slide
-            self.isGoingRight = True
         
         self.rect = pg.Rect(self.pos.x, self.pos.y, self.size.x, self.size.y)
 
     def tick(self):
-        if self.isMoving:
-            if self.isX:
-                if self.rect.right >= SCREEN_WIDTH:
-                    self.isGoingRight = False
-                if self.rect.left <= 0:
-                    self.isGoingRight = True
-                if self.isGoingRight: self.pos.x += 1
-                else: self.pos.x -= 1
-            else:
-                if self.rect.bottom >= SCREEN_HEIGHT:
-                    self.isGoingRight = False
-                if self.rect.top <= 0:
-                    self.isGoingRight = True
-                if self.isGoingRight: self.pos.y += 1
-                else: self.pos.y -= 1
-
         self.rect.centerx = self.pos.x
         self.rect.centery = self.pos.y
 
@@ -585,36 +574,36 @@ class Particle:
         pydraw.rect(screen, self.col, self.rect)
         self.lifetime += 1
 
+# work on later
 class EditorHandler:
     def __init__(self):
-        self.mouse = pymath.Vector2(pg.mouse.get_pos())
-        self.mousepress = pg.mouse.get_pressed(3)
-        self.prevMousepress = self.mousepress
-        self.hasClicked = [False, False, False]
-        self.clickpos = [pymath.Vector2(0, 0), pymath.Vector2(0, 0)]
+        self.mouse = pg.mouse.get_pressed(3)
+        self.mouse = self.mouse[0]
+        self.mouse = [self.mouse, pg.mouse.get_pos()]
+        self.prev_mouse = self.mouse
+        self.mousedata = []
+        self.hasclicked = False
 
     def tick(self):
-        global blockList
-        self.mouse = pymath.Vector2(pg.mouse.get_pos())
-        self.mousepress = [pg.mouse.get_pressed(3)]
-        self.mousepress = self.mousepress[0]
+        self.mouse = pg.mouse.get_pressed(3)
+        self.mouse = self.mouse[0]
+        self.mouse = [self.mouse, pg.mouse.get_pos()]
 
-        if self.mousepress[0] != self.prevMousepress[0] and self.mousepress[0] == True:
-            if self.hasClicked[0]:
-                self.hasClicked[0] = False
-                self.clickpos[1] = pymath.Vector2(self.mouse.x, self.mouse.y)
-
-                block = Block(self.clickpos[0], (self.clickpos[0].x - self.clickpos[1].x, self.clickpos[0].y - self.clickpos[1].y), False)
-                blockList.append(block)
-                print(block.rect, block.isMoving)
-                if block.isMoving:
-                    print(block.isX)
+        if self.mouse[0] != self.prev_mouse[0] and self.mouse[0] == True:
+            if self.hasclicked == True:
+                self.hasclicked = False
             else:
-                self.hasClicked[0] = True
-                self.clickpos[0] = pymath.Vector2(self.mouse.x, self.mouse.y)
+                self.hasclicked = True
+                self.mousedata = self.mouse
 
-        #print(self.mouse, self.mousepress[0], self.prevMousepress[0], self.hasClicked[0], self.clickpos, blockList, isInEditor)
-        self.prevMousepress = self.mousepress
+        print(self.mouse, self.prev_mouse, self.hasclicked, self.mousedata)
+        self.prev_mouse = self.mouse
+        """block = Block((self.clickpos[0].x, self.clickpos[0].y), (self.mouse[0] - self.clickpos[0].x, self.mouse[1] - self.clickpos[0].x))
+                blockList.append(block)
+                x = str([block.pos.x, block.pos.y, block.size.x, block.size.y])
+                self.currentSave.append(x)
+                levela.write(x)
+                levela.write('\n')"""
 
 pg.mixer.pre_init(44100, -16, 2, 512)
 pg.init()
@@ -649,7 +638,8 @@ startGame("default")
 
 if isInEditor:
     editor = EditorHandler()
-    loadSaves()
+
+loadSaves()
 
 while isRunning == True:
     for event in pg.event.get():
@@ -686,6 +676,9 @@ while isRunning == True:
     screen.fill((0, 0, 0))
     screen.blit(bgimg, bgrect)
 
+    for block in blockList:
+        block.tick()
+
     for player in playerList:
         player.tick()
     
@@ -694,9 +687,6 @@ while isRunning == True:
 
     if isInEditor:
         editor.tick()
-
-    for block in blockList:
-        block.tick()
 
     pg.display.update()
     clock.tick(FPS)
