@@ -84,7 +84,7 @@ def loadSaves():
                 temp[i] = int(temp[i])
             block = Block((temp[0], temp[1]), (temp[2], temp[3]))
             blockList.append(block)
-            print(block.pos.y)
+            #print(block.pos.y)
         else:
             break
 
@@ -259,7 +259,10 @@ class Player:
             
             dir = (0 - dir[0], 0 - dir[1])
 
-            ball = Ball((self.pos.x, self.pos.y), speed=dir, type=self.ballType)
+            if self.ballType != "magic":
+                ball = Ball((self.pos.x, self.pos.y), speed=dir, type=self.ballType)
+            else:
+                ball = Ball((self.pos.x, self.pos.y), speed=(dir[0]/100, dir[1]/100), type=self.ballType)
             ballList.append(ball)
             self.hasBall = False
             if isMuted == False: self.throwsfx.play()
@@ -419,8 +422,9 @@ class Ball:
     def tick(self):
         self.lifetime += 1
         self.specialUpdate()
-        if self.speed.y < 15:
-            self.speed.y += self.weight
+        if self.type != "magic":
+            if self.speed.y < 15:
+                self.speed.y += self.weight
         for block in blockList:
             if self.rect.colliderect(block):
                 if self.rect.bottom <= block.rect.top + 20:
@@ -516,6 +520,44 @@ class Ball:
         if self.type == "steel":
             self.weight = 1.25
 
+        if self.type == "magic":
+            # force = G*mass1*mass2/distance**2
+            # G = 6.67430(15)
+            G = 6.67430*15
+            m1 = 100.0
+            m2 = 1000.0
+
+            for player in playerList:
+                dx = self.pos.x - player.pos.x
+                dy = self.pos.y - player.pos.y
+                if dx == 0:
+                    dx = 0.00001
+                if dy == 0:
+                    dy = 0.00001
+                Fx = G*(m1*m2)/dx**2
+                Fy = G*(m1*m2)/dy**2
+                Fx = 1 / Fx
+                Fy = 1 / Fy
+
+                if self.pos.x > player.pos.x:
+                    if Fx < 0:
+                        Fx = 0 - Fx
+                if self.pos.x < player.pos.x:
+                    if Fx > 0:
+                        Fx = 0 - Fx
+
+                if self.pos.y < player.pos.y:
+                    if Fy < 0:
+                        Fy = 0 - Fy
+                if self.pos.y > player.pos.y:
+                    if Fy > 0:
+                        Fy = 0 - Fy
+
+            print(Fy, Fx)
+
+            self.speed.x -= Fx * 10
+            self.speed.y += Fy * 10
+            #print(self.pos)
 
 class ParticleSystem:
     def __init__(self, pos, speed, gravity, spread, col, size, lifetime, spawnrate):
@@ -596,7 +638,7 @@ class EditorHandler:
                 self.hasclicked = True
                 self.mousedata = self.mouse
 
-        print(self.mouse, self.prev_mouse, self.hasclicked, self.mousedata)
+        #print(self.mouse, self.prev_mouse, self.hasclicked, self.mousedata)
         self.prev_mouse = self.mouse
         """block = Block((self.clickpos[0].x, self.clickpos[0].y), (self.mouse[0] - self.clickpos[0].x, self.mouse[1] - self.clickpos[0].x))
                 blockList.append(block)
