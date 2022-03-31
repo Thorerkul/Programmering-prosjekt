@@ -553,11 +553,9 @@ class Ball:
                     if Fy > 0:
                         Fy = 0 - Fy
 
-            print(Fy, Fx)
-
             self.speed.x -= Fx * 10
             self.speed.y += Fy * 10
-            #print(self.pos)
+        
 
 class ParticleSystem:
     def __init__(self, pos, speed, gravity, spread, col, size, lifetime, spawnrate):
