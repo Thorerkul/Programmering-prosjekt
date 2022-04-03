@@ -10,7 +10,7 @@ def quit():
 def startGame(map):
     global player, floor, test, bgimg, bgrect
     if map == "empty":
-        bgimg = pg.image.load(r'src\assets\art\bg\space.png').convert_alpha()
+        bgimg = pg.image.load(r'assets\art\bg\space.png').convert_alpha()
         bgimg = pg.transform.scale(bgimg, (SCREEN_WIDTH, SCREEN_HEIGHT))
         bgrect = pg.Rect(0, 0, window.current_w, window.current_h)
 
@@ -24,7 +24,7 @@ def startGame(map):
 
     if map == "editor":
         #global isInEditor
-        bgimg = pg.image.load(r'src\assets\art\bg\black.png').convert_alpha()
+        bgimg = pg.image.load(r'assets\art\bg\black.png').convert_alpha()
         bgimg = pg.transform.scale(bgimg, (SCREEN_WIDTH, SCREEN_HEIGHT))
         bgrect = pg.Rect(0, 0, window.current_w, window.current_h)
 
@@ -42,7 +42,7 @@ def startGame(map):
     if map == "default":
         global dummy, particlesystem, isInEditor
 
-        bgimg = pg.image.load(r'src\assets\art\bg\hell.png').convert_alpha()
+        bgimg = pg.image.load(r'assets\art\bg\hell.png').convert_alpha()
         bgimg = pg.transform.scale(bgimg, (SCREEN_WIDTH, SCREEN_HEIGHT))
         bgrect = pg.Rect(0, 0, window.current_w, window.current_h)
 
@@ -65,8 +65,8 @@ def startGame(map):
 
 def loadSaves():
     global levelr, levela, blockList
-    levela = open('src\\assets\saves\saves.txt', 'a')
-    levelr = open('src\\assets\saves\saves.txt', 'r')
+    levela = open('assets\saves\saves.txt', 'a')
+    levelr = open('assets\saves\saves.txt', 'r')
 
     x = 0
     while True:
@@ -109,9 +109,9 @@ class Player:
 
         self.ballType = ""  
 
-        self.jumpsfx = pg.mixer.Sound(r'src\assets\lyd\jump.wav')
-        self.pickupsfx = pg.mixer.Sound(r'src\assets\lyd\pickup.wav')
-        self.throwsfx = pg.mixer.Sound(r'src\assets\lyd\throw.wav')
+        self.jumpsfx = pg.mixer.Sound(r'assets\lyd\jump.wav')
+        self.pickupsfx = pg.mixer.Sound(r'assets\lyd\pickup.wav')
+        self.throwsfx = pg.mixer.Sound(r'assets\lyd\throw.wav')
 
         self.rect = pg.Rect(self.pos.x, self.pos.y, self.size.x - 10, self.size.y - 10)
         self.col = pymath.Vector3(255, 255, 255) # temp color
@@ -124,7 +124,7 @@ class Player:
         self.holdingsprites = []
 
         if self.char == "billy" or self.char == "dummy":
-            path = 'src\\assets\\art\\karakterer\\Billy\\billy00'
+            path = 'assets\\art\\karakterer\\Billy\\billy00'
             for i in range(30):
                 if i >= 9:
                     file = path + str(i + 1) + '.png'
@@ -138,11 +138,11 @@ class Player:
 
                 self.holdingsprites.append(pg.image.load(file).convert_alpha())
 
-            self.standingSprite = pg.image.load(r'src\assets\art\karakterer\Billy\billy0007.png').convert_alpha()
-            self.airSprite = pg.image.load(r'src\assets\art\karakterer\Billy\billy0055.png').convert_alpha()
+            self.standingSprite = pg.image.load(r'assets\art\karakterer\Billy\billy0007.png').convert_alpha()
+            self.airSprite = pg.image.load(r'assets\art\karakterer\Billy\billy0055.png').convert_alpha()
 
         if self.char == "bald":
-            path = 'src\\assets\\art\\karakterer\\BaldGuy\\baldguy'
+            path = 'assets\\art\\karakterer\\BaldGuy\\baldguy'
             for i in range(30):
                 if i >= 9:
                     file = path + '00' + str(i + 1) + '.png'
@@ -150,7 +150,7 @@ class Player:
                     file = path + '000' + str(i + 1) + '.png'
 
                 if i == 19:
-                    file = 'src\\assets\\art\\karakterer\\BaldGuy\\baldguy0030.png'
+                    file = 'assets\\art\\karakterer\\BaldGuy\\baldguy0030.png'
 
                 print(file)
                 self.runningsprites.append(pg.image.load(file).convert_alpha())
@@ -160,8 +160,8 @@ class Player:
 
                 self.holdingsprites.append(pg.image.load(file).convert_alpha())
 
-            self.standingSprite = pg.image.load(r'src\assets\art\karakterer\BaldGuy\baldguy0007.png').convert_alpha()
-            self.airSprite = pg.image.load(r'src\assets\art\karakterer\BaldGuy\baldguy0055.png').convert_alpha()
+            self.standingSprite = pg.image.load(r'assets\art\karakterer\BaldGuy\baldguy0007.png').convert_alpha()
+            self.airSprite = pg.image.load(r'assets\art\karakterer\BaldGuy\baldguy0055.png').convert_alpha()
 
         # rescaling
         for i in range(len(self.runningsprites)):
@@ -262,7 +262,7 @@ class Player:
             if self.ballType != "magic":
                 ball = Ball((self.pos.x, self.pos.y), speed=dir, type=self.ballType)
             else:
-                ball = Ball((self.pos.x, self.pos.y), speed=(dir[0]/100, dir[1]/100), type=self.ballType)
+                ball = Ball((self.pos.x, self.pos.y), speed=(dir[0]/10, dir[1]/10), type=self.ballType)
             ballList.append(ball)
             self.hasBall = False
             if isMuted == False: self.throwsfx.play()
@@ -391,24 +391,24 @@ class Ball:
         self.weight = 0.5
         self.lifetime = 0
 
-        self.bounceSound = pg.mixer.Sound(r'src\assets\lyd\ballBounce.wav')
+        self.bounceSound = pg.mixer.Sound(r'assets\lyd\ballBounce.wav')
 
         if self.type == "basic":
-            self.image = pg.image.load(r'src\assets\art\balls\Basic_ball.png').convert_alpha()
+            self.image = pg.image.load(r'assets\art\balls\Basic_ball.png').convert_alpha()
         elif self.type == "ice":
-            self.image = pg.image.load(r'src\assets\art\balls\ice_ball.png').convert_alpha()
+            self.image = pg.image.load(r'assets\art\balls\ice_ball.png').convert_alpha()
         elif self.type == "steel":
-            self.image = pg.image.load(r'src\assets\art\balls\steel_ball.png').convert_alpha()
+            self.image = pg.image.load(r'assets\art\balls\steel_ball.png').convert_alpha()
         elif self.type == "sun":
-            self.image = pg.image.load(r'src\assets\art\balls\Sun_ball.png').convert_alpha()
+            self.image = pg.image.load(r'assets\art\balls\Sun_ball.png').convert_alpha()
         elif self.type == "nature":
-            self.image = pg.image.load(r'src\assets\art\balls\nature_ball.png').convert_alpha()
+            self.image = pg.image.load(r'assets\art\balls\nature_ball.png').convert_alpha()
         elif self.type == "magic":
-            self.image = pg.image.load(r'src\assets\art\balls\magic_ball.png').convert_alpha()
+            self.image = pg.image.load(r'assets\art\balls\magic_ball.png').convert_alpha()
         elif self.type == "soul":
-            self.image = pg.image.load(r'src\assets\art\balls\soul_ball.png').convert_alpha()
+            self.image = pg.image.load(r'assets\art\balls\soul_ball.png').convert_alpha()
         elif self.type == "obsidian":
-            self.image = pg.image.load(r'src\assets\art\balls\obsidian_ball.png').convert_alpha()
+            self.image = pg.image.load(r'assets\art\balls\obsidian_ball.png').convert_alpha()
         self.image = pg.transform.scale(self.image, (self.size + 9, self.size + 9))
         
         self.boucesLeft = 3
@@ -529,9 +529,24 @@ class Ball:
             Fx = []
             Fy = []
 
+<<<<<<< HEAD
             for i in enumerate(playerList):
                 dx = self.pos.x - playerList[i].pos.x
                 dy = self.pos.y - playerList[i].pos.y
+=======
+            for player in playerList:
+                Fx = 0
+                Fy = 0
+                dx = 0
+                dy = 0
+                
+                dx = self.pos.x - player.pos.x
+                dy = self.pos.y - player.pos.y
+
+                dx = math.sqrt(dx**2)
+                dx = math.sqrt(dx**2)
+                
+>>>>>>> d3f1f16 (Update main.py)
                 if dx == 0:
                     dx = 0.00001
                 if dy == 0:
@@ -555,8 +570,16 @@ class Ball:
                     if Fy > 0:
                         Fy = 0 - Fy
 
+<<<<<<< HEAD
             self.speed.x -= Fx * 10
             self.speed.y += Fy * 10
+=======
+                if player.char == "dummy":
+
+                    self.speed.x -= Fx * 100
+                    self.speed.y += Fy * 100
+        
+>>>>>>> d3f1f16 (Update main.py)
 
 class ParticleSystem:
     def __init__(self, pos, speed, gravity, spread, col, size, lifetime, spawnrate):
@@ -656,17 +679,19 @@ SCREEN_HEIGHT = 512
 screen = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 clock = pg.time.Clock()
 game_font = pg.font.Font(None, 25)
+pause_font = pg.font.Font(None, 60)
 isRunning = True
 FPS = 60
 isMuted = True
 isFullscreen = True
 isInEditor = False
+isPaused = False
 pg.mixer.music.set_volume(0.1)
 #pg.display.toggle_fullscreen() 
 
 def load_music():
     x = random.randint(1, 3)
-    y = r'src\assets\lyd\Music\Juhani Junkala [Retro Game Music Pack] Level ' + str(x) + '.wav'
+    y = r'assets\lyd\Music\Juhani Junkala [Retro Game Music Pack] Level ' + str(x) + '.wav'
     pg.mixer.music.load(y)
 
 load_music()
@@ -689,7 +714,10 @@ while isRunning == True:
 
         if event.type == pg.KEYDOWN:
             if event.key == pg.K_ESCAPE:
-                quit()
+                if isPaused == True:
+                    isPaused = False
+                else:
+                    isPaused = True
             if event.key == pg.K_F11:
                 if isFullscreen:
                     isFullscreen = False
@@ -714,20 +742,29 @@ while isRunning == True:
                     if player.char != "dummy":
                         player.pickup()
 
-    screen.fill((0, 0, 0))
-    screen.blit(bgimg, bgrect)
+    if isPaused == False:
+        screen.fill((0, 0, 0))
+        screen.blit(bgimg, bgrect)
+        
+        for block in blockList:
+            block.tick()
 
-    for block in blockList:
-        block.tick()
-
-    for player in playerList:
-        player.tick()
+        for player in playerList:
+            player.tick()
     
-    for ball in ballList:
-        ball.tick()
+        for ball in ballList:
+            ball.tick()
 
-    if isInEditor:
-        editor.tick()
+        if isInEditor:
+            editor.tick()
+
+    else:
+        text = "Paused"
+        surf = pause_font.render(text, False, (255, 255, 255))
+        rect = surf.get_rect()
+        rect.center = (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
+        pydraw.rect(screen, (0, 0, 0), rect)
+        screen.blit(surf, rect)
 
     pg.display.update()
     clock.tick(FPS)
