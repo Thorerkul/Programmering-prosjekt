@@ -21,6 +21,8 @@ def startGame(map):
 
         test = Ball((50, 50), type="ice")
         ballList.append(test)
+        
+        loadSaves()
 
     if map == "editor":
         #global isInEditor
@@ -38,6 +40,8 @@ def startGame(map):
 
         #isInEditor = True
         editor = EditorHandler()
+        
+        loadSaves()
 
     if map == "default":
         global dummy, particlesystem, isInEditor
@@ -62,6 +66,8 @@ def startGame(map):
 
         particlesystem = ParticleSystem((500, 500), (10, -10), 1, 5, (255, 255, 255), 10, 50, 1)
         isInEditor = True
+        
+        loadSaves()
 
 def loadSaves():
     global levelr, levela, blockList
@@ -74,15 +80,15 @@ def loadSaves():
         if content != '':
             temp = ''
             for char in content:
-                if char == ']':
+                if char == ')':
                     break
                 temp = temp + char
-            temp = temp.replace('[', '')
+            temp = temp.replace('(', '')
             temp = temp.split(', ')
             for i in range(len(temp)):
                 temp[i] = float(temp[i])
                 temp[i] = int(temp[i])
-            block = Block((temp[0], temp[1]), (temp[2], temp[3]))
+            block = Block((temp[0], temp[1]), (100, 20))
             blockList.append(block)
             #print(block.pos.y)
         else:
@@ -643,24 +649,27 @@ class EditorHandler:
     def __init__(self):
         self.mouse = pg.mouse.get_pressed(3)
         self.mouse = self.mouse[0]
-        self.mouse = [self.mouse, pg.mouse.get_pos()]
+        self.mouse_pos = pg.mouse.get_pos()
         self.prev_mouse = self.mouse
-        self.mousedata = []
-        self.hasclicked = False
 
     def tick(self):
         self.mouse = pg.mouse.get_pressed(3)
         self.mouse = self.mouse[0]
-        self.mouse = [self.mouse, pg.mouse.get_pos()]
-
-        if self.mouse[0] != self.prev_mouse[0] and self.mouse[0] == True:
-            if self.hasclicked == True:
-                self.hasclicked = False
-            else:
-                self.hasclicked = True
-                self.mousedata = self.mouse
-
-        #print(self.mouse, self.prev_mouse, self.hasclicked, self.mousedata)
+        self.mouse_pos = pg.mouse.get_pos()
+        if self.mouse != self.prev_mouse and self.mouse == True:
+            block = Block((self.mouse_pos[0], self.mouse_pos[1]), (100, 20))
+            block.rect.centerx = self.mouse_pos[0]
+            block.rect.centery = self.mouse_pos[1]
+            blockList.append(block)
+            x = str(self.mouse_pos)
+            levela.write(x)
+            levela.write('\n')
+            
+        tempblock = Block((self.mouse_pos[0], self.mouse_pos[1]), (100, 20))
+        tempblock.rect.centerx = self.mouse_pos[0]
+        tempblock.rect.centery = self.mouse_pos[1]
+        pydraw.rect(screen, (0, 0, 0), tempblock)
+            
         self.prev_mouse = self.mouse
         """block = Block((self.clickpos[0].x, self.clickpos[0].y), (self.mouse[0] - self.clickpos[0].x, self.mouse[1] - self.clickpos[0].x))
                 blockList.append(block)
@@ -704,8 +713,6 @@ startGame("default")
 
 if isInEditor:
     editor = EditorHandler()
-
-loadSaves()
 
 while isRunning == True:
     for event in pg.event.get():
