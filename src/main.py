@@ -647,14 +647,21 @@ class Particle:
 # work on later
 class EditorHandler:
     def __init__(self):
+        self.mouse_pos = pg.mouse.get_pos()
         self.mouse = pg.mouse.get_pressed(3)
         self.mouse = self.mouse[0]
+<<<<<<< HEAD
         self.mouse_pos = pg.mouse.get_pos()
+=======
+        self.mouse = int(self.mouse)
+>>>>>>> 54d946d (fghjk)
         self.prev_mouse = self.mouse
 
     def tick(self):
+        self.mouse_pos = pg.mouse.get_pos()
         self.mouse = pg.mouse.get_pressed(3)
         self.mouse = self.mouse[0]
+<<<<<<< HEAD
         self.mouse_pos = pg.mouse.get_pos()
         if self.mouse != self.prev_mouse and self.mouse == True:
             block = Block((self.mouse_pos[0], self.mouse_pos[1]), (100, 20))
@@ -670,6 +677,20 @@ class EditorHandler:
         tempblock.rect.centery = self.mouse_pos[1]
         pydraw.rect(screen, (0, 0, 0), tempblock)
             
+=======
+        self.mouse = int(self.mouse)
+
+        rect = pg.Rect(self.mouse_pos[0], self.mouse_pos[1], 100, 20)
+        rect.center = (self.mouse_pos[0], self.mouse_pos[1])
+        pydraw.rect(screen, (0, 0, 0), rect)
+
+        if self.mouse != self.prev_mouse and self.mouse == True:
+            block = Block((self.mouse_pos[0], self.mouse_pos[1]), (100, 20))
+            blockList.append(block)
+            x = block.pos
+            levela.write(str(x))
+            levela.write('\n')
+>>>>>>> 54d946d (fghjk)
         self.prev_mouse = self.mouse
         """block = Block((self.clickpos[0].x, self.clickpos[0].y), (self.mouse[0] - self.clickpos[0].x, self.mouse[1] - self.clickpos[0].x))
                 blockList.append(block)
