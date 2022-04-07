@@ -526,36 +526,37 @@ class Ball:
             G = 6.67430*15
             m1 = 100.0
             m2 = 1000.0
+            Fx = []
+            Fy = []
 
-            for player in playerList:
-                dx = self.pos.x - player.pos.x
-                dy = self.pos.y - player.pos.y
+            for i in enumerate(playerList):
+                dx = self.pos.x - playerList[i].pos.x
+                dy = self.pos.y - playerList[i].pos.y
                 if dx == 0:
                     dx = 0.00001
                 if dy == 0:
                     dy = 0.00001
-                Fx = G*(m1*m2)/dx**2
-                Fy = G*(m1*m2)/dy**2
-                Fx = 1 / Fx
-                Fy = 1 / Fy
+                Fx.append(G*(m1*m2)/dx**2)
+                Fy.append(G*(m1*m2)/dy**2)
+                Fx[i] = 1 / Fx
+                Fy[i] = 1 / Fy
 
-                if self.pos.x > player.pos.x:
+                if self.pos.x > playerList[i].pos.x:
                     if Fx < 0:
                         Fx = 0 - Fx
-                if self.pos.x < player.pos.x:
+                if self.pos.x < playerList[i].pos.x:
                     if Fx > 0:
                         Fx = 0 - Fx
 
-                if self.pos.y < player.pos.y:
+                if self.pos.y < playerList[i].pos.y:
                     if Fy < 0:
                         Fy = 0 - Fy
-                if self.pos.y > player.pos.y:
+                if self.pos.y > playerList[i].pos.y:
                     if Fy > 0:
                         Fy = 0 - Fy
 
             self.speed.x -= Fx * 10
             self.speed.y += Fy * 10
-        
 
 class ParticleSystem:
     def __init__(self, pos, speed, gravity, spread, col, size, lifetime, spawnrate):
