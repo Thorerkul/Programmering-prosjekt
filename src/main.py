@@ -699,6 +699,33 @@ class EditorHandler:
                 levela.write(x)
                 levela.write('\n')"""
 
+class HUD:
+    def __init__(self):
+        self.hotbar_pos = pymath.Vector2(SCREEN_WIDTH / 2, 0)
+        self.hotbar_num_items = 8
+        self.hotbar_size = 19
+        self.red_icon = pg.image.load(r'src\assets\art\balls\Basic_ball.png').convert_alpha()
+        self.ice_icon = pg.image.load(r'src\assets\art\balls\ice_icon.png').convert_alpha()
+        self.steel_icon = pg.image.load(r'src\assets\art\balls\steel_icon.png').convert_alpha()
+        self.sun_icon = pg.image.load(r'src\assets\art\balls\sun_icon.png').convert_alpha()
+        self.nature_icon = pg.image.load(r'src\assets\art\balls\nature_icon.png').convert_alpha()
+        self.magic_icon = pg.image.load(r'src\assets\art\balls\magic_icon.png').convert_alpha()
+        self.soul_icon = pg.image.load(r'src\assets\art\balls\soul_icon.png').convert_alpha()
+        self.obsidian_icon = pg.image.load(r'src\assets\art\balls\obsidian_icon.png').convert_alpha()
+        self.hotbar_bg = pg.image.load(r'src\assets\art\balls\bg.png').convert_alpha()
+
+        self.hotbarList = []
+        for i in range(self.hotbar_num_items):
+            posx = 0
+            print(posx)
+            rect = pg.Rect(posx, 0, self.hotbar_size, self.hotbar_size)
+            rect.top = 0
+            self.hotbarList.append(rect)
+
+    def tick(self):
+        for i in self.hotbarList:
+            pydraw.rect(screen, (100, 100, 100), i)
+
 pg.mixer.pre_init(44100, -16, 2, 512)
 pg.init()
 
@@ -735,6 +762,13 @@ startGame("default")
 if isInEditor:
     editor = EditorHandler()
 
+<<<<<<< HEAD
+=======
+loadSaves()
+
+hud = HUD()
+
+>>>>>>> 0d7b8aa (h)
 while isRunning == True:
     for event in pg.event.get():
         if event.type == pg.QUIT:
@@ -793,6 +827,8 @@ while isRunning == True:
         rect.center = (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
         pydraw.rect(screen, (0, 0, 0), rect)
         screen.blit(surf, rect)
+
+    hud.tick()
 
     pg.display.update()
     clock.tick(FPS)
