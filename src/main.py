@@ -536,6 +536,7 @@ class Ball:
             Fy = []
 
 <<<<<<< HEAD
+<<<<<<< HEAD
             for i in enumerate(playerList):
                 dx = self.pos.x - playerList[i].pos.x
                 dy = self.pos.y - playerList[i].pos.y
@@ -553,12 +554,18 @@ class Ball:
                 dx = math.sqrt(dx**2)
                 
 >>>>>>> d3f1f16 (Update main.py)
+=======
+            for i, val in enumerate(playerList):
+                dx = self.pos.x - val.pos.x
+                dy = self.pos.y - val.pos.y
+>>>>>>> d5c4054 (l)
                 if dx == 0:
                     dx = 0.00001
                 if dy == 0:
                     dy = 0.00001
                 Fx.append(G*(m1*m2)/dx**2)
                 Fy.append(G*(m1*m2)/dy**2)
+<<<<<<< HEAD
                 Fx[i] = 1 / Fx
                 Fy[i] = 1 / Fy
 
@@ -586,6 +593,29 @@ class Ball:
                     self.speed.y += Fy * 100
         
 >>>>>>> d3f1f16 (Update main.py)
+=======
+                Fx[i] = 1 / Fx[i]
+                Fy[i] = 1 / Fy[i]
+
+                if self.pos.x > val.pos.x:
+                    if Fx[i] < 0:
+                        Fx[i] = 0 - Fx[i]
+                if self.pos.x < val.pos.x:
+                    if Fx[i] > 0:
+                        Fx[i] = 0 - Fx[i]
+
+                if self.pos.y < val.pos.y:
+                    if Fy[i] < 0:
+                        Fy[i] = 0 - Fy[i]
+                if self.pos.y > val.pos.y:
+                    if Fy[i] > 0:
+                        Fy[i] = 0 - Fy[i]
+
+            for i, val in enumerate(Fx):
+                self.speed.x -= val * 10
+            for i, val in enumerate(Fy):
+                self.speed.y += val * 10
+>>>>>>> d5c4054 (l)
 
 class ParticleSystem:
     def __init__(self, pos, speed, gravity, spread, col, size, lifetime, spawnrate):
@@ -703,28 +733,73 @@ class HUD:
     def __init__(self):
         self.hotbar_pos = pymath.Vector2(SCREEN_WIDTH / 2, 0)
         self.hotbar_num_items = 8
-        self.hotbar_size = 19
+        self.hotbar_size = 40
+        self.iconList = []
         self.red_icon = pg.image.load(r'src\assets\art\balls\Basic_ball.png').convert_alpha()
+        self.iconList.append(self.red_icon)
         self.ice_icon = pg.image.load(r'src\assets\art\balls\ice_icon.png').convert_alpha()
+        self.iconList.append(self.ice_icon)
         self.steel_icon = pg.image.load(r'src\assets\art\balls\steel_icon.png').convert_alpha()
+        self.iconList.append(self.steel_icon)
         self.sun_icon = pg.image.load(r'src\assets\art\balls\sun_icon.png').convert_alpha()
+        self.iconList.append(self.sun_icon)
         self.nature_icon = pg.image.load(r'src\assets\art\balls\nature_icon.png').convert_alpha()
+        self.iconList.append(self.nature_icon)
         self.magic_icon = pg.image.load(r'src\assets\art\balls\magic_icon.png').convert_alpha()
+        self.iconList.append(self.magic_icon)
         self.soul_icon = pg.image.load(r'src\assets\art\balls\soul_icon.png').convert_alpha()
+        self.iconList.append(self.soul_icon)
         self.obsidian_icon = pg.image.load(r'src\assets\art\balls\obsidian_icon.png').convert_alpha()
+        self.iconList.append(self.obsidian_icon)
         self.hotbar_bg = pg.image.load(r'src\assets\art\balls\bg.png').convert_alpha()
+        self.hotbar_bg = pg.transform.scale(self.hotbar_bg, (self.hotbar_size, self.hotbar_size))
+
+        for i, val in enumerate(self.iconList):
+            self.iconList[i] = pg.transform.scale(self.iconList[i], (self.hotbar_size - 10, self.hotbar_size - 10))
+
+
+        self.select_arrow = pg.image.load(r'src\assets\art\diverse\select arrow.png').convert_alpha()
+        self.select_arrow = pg.transform.scale(self.select_arrow, (20, 20))
+        self.selectRect = pg.Rect(-100, 50, 20, 20)
 
         self.hotbarList = []
         for i in range(self.hotbar_num_items):
-            posx = 0
-            print(posx)
+            y = i - self.hotbar_num_items / 2
+            z = self.hotbar_size + 3 * self.hotbar_num_items
+
+            x = y * self.hotbar_size
+
+            posx = x + SCREEN_WIDTH / 2
+            posx = posx + y * 5
             rect = pg.Rect(posx, 0, self.hotbar_size, self.hotbar_size)
-            rect.top = 0
+            rect.centery = self.hotbar_size / 2
+            rect.centerx = posx
             self.hotbarList.append(rect)
 
     def tick(self):
-        for i in self.hotbarList:
-            pydraw.rect(screen, (100, 100, 100), i)
+        for i, val in enumerate(self.hotbarList):
+            screen.blit(self.hotbar_bg, val)
+            screen.blit(self.iconList[i], pg.Rect(val.left + 5, val.top + 5, self.hotbar_size - 10, self.hotbar_size - 10))
+
+        for player in playerList:
+            if player.ballType == "basic":
+                self.selectRect.centerx = self.hotbarList[0].centerx
+            if player.ballType == "ice":
+                self.selectRect.centerx = self.hotbarList[1].centerx
+            if player.ballType == "steel":
+                self.selectRect.centerx = self.hotbarList[2].centerx
+            if player.ballType == "sun":
+                self.selectRect.centerx = self.hotbarList[3].centerx
+            if player.ballType == "nature":
+                self.selectRect.centerx = self.hotbarList[4].centerx
+            if player.ballType == "magic":
+                self.selectRect.centerx = self.hotbarList[5].centerx
+            if player.ballType == "soul":
+                self.selectRect.centerx = self.hotbarList[6].centerx
+            if player.ballType == "obsidian":
+                self.selectRect.centerx = self.hotbarList[7].centerx
+        print(player.ballType, self.selectRect.center)
+        screen.blit(self.select_arrow, self.selectRect)
 
 pg.mixer.pre_init(44100, -16, 2, 512)
 pg.init()
