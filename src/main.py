@@ -46,7 +46,11 @@ def startGame(map):
     if map == "default":
         global dummy, particlesystem, isInEditor
 
+<<<<<<< HEAD
         bgimg = pg.image.load(r'assets\art\bg\hell.png').convert_alpha()
+=======
+        bgimg = pg.image.load(r'src\assets\art\bg\space.png').convert_alpha()
+>>>>>>> 130e607 (d)
         bgimg = pg.transform.scale(bgimg, (SCREEN_WIDTH, SCREEN_HEIGHT))
         bgrect = pg.Rect(0, 0, window.current_w, window.current_h)
 
@@ -93,6 +97,14 @@ def loadSaves():
             #print(block.pos.y)
         else:
             break
+
+def get_closest_value(input_list, input_value):
+ 
+  difference = lambda input_list : abs(input_list - input_value)
+ 
+  res = min(input_list, key=difference)
+ 
+  return res
 
 class Player:
     def __init__(self, size, pos, char="billy"):
@@ -488,6 +500,20 @@ class Ball:
                         self.rect.centerx = self.pos.x
                         self.rect.centery = self.pos.y
                     self.boucesLeft -= 1
+
+        for player in aiList:
+            if self.rect.colliderect(player):
+                if self.isThrown:
+                    self.speed.x = 0 - self.speed.x
+                    self.speed.y = 0 - self.speed.y
+                    
+                    while self.rect.colliderect(player):
+                        self.pos.x += self.speed.x
+                        self.pos.y += self.speed.y
+                        
+                        self.rect.centerx = self.pos.x
+                        self.rect.centery = self.pos.y
+                    self.boucesLeft -= 1
                     
         if self.boucesLeft <= 0:
             self.isThrown = False
@@ -798,8 +824,343 @@ class HUD:
                 self.selectRect.centerx = self.hotbarList[6].centerx
             if player.ballType == "obsidian":
                 self.selectRect.centerx = self.hotbarList[7].centerx
-        print(player.ballType, self.selectRect.center)
         screen.blit(self.select_arrow, self.selectRect)
+
+class Ai:
+    def __init__(self, size, pos, char="billy"):
+        self.pos = pymath.Vector2(pos)
+        self.size = pymath.Vector2(size)
+        self.speed = pymath.Vector2(0, 0)
+        self.max_speed = 6
+        self.canJump = False
+        self.prev_keys = []
+        self.char = char
+        self.lastMoveDir = pymath.Vector2(0, 0)
+        self.hasBall = False
+        self.prev_hasBall = False
+        self.isOnGround = False
+        self.isGoingUp = False
+        self.weight = 0.5
+        self.defaultWeight = 0.5
+        self.maxhp = 100
+        self.hp = self.maxhp
+
+        self.ballType = ""  
+
+        self.jumpsfx = pg.mixer.Sound(r'src\assets\lyd\jump.wav')
+        self.pickupsfx = pg.mixer.Sound(r'src\assets\lyd\pickup.wav')
+        self.throwsfx = pg.mixer.Sound(r'src\assets\lyd\throw.wav')
+
+        self.rect = pg.Rect(self.pos.x, self.pos.y, self.size.x - 10, self.size.y - 10)
+        self.col = pymath.Vector3(255, 255, 255) # temp color
+
+        self.loadSprites()
+        self.current_frame = 0
+
+        self.target = ""
+        self.targetlist = ["", "left", "right", "jump", "ball", "ball", "away", "away"]
+        self.isGoingRight = False
+        self.isMoving = False
+        self.timer = 0
+        self.timeTimer = 1
+        self.timerRandom = random.randrange(0, 20) - 10
+
+    def loadSprites(self):
+        self.runningsprites = []
+        self.holdingsprites = []
+
+        if self.char == "billy" or self.char == "dummy":
+            path = 'src\\assets\\art\\karakterer\\Billy\\billy00'
+            for i in range(30):
+                if i >= 9:
+                    file = path + str(i + 1) + '.png'
+                else:
+                    file = path + '0' + str(i + 1) + '.png'
+
+                self.runningsprites.append(pg.image.load(file).convert_alpha())
+
+            for i in range(30):
+                file = path + str(i + 32) + '.png'
+
+                self.holdingsprites.append(pg.image.load(file).convert_alpha())
+
+            self.standingSprite = pg.image.load(r'src\assets\art\karakterer\Billy\billy0007.png').convert_alpha()
+            self.airSprite = pg.image.load(r'src\assets\art\karakterer\Billy\billy0055.png').convert_alpha()
+
+        if self.char == "bald":
+            path = 'src\\assets\\art\\karakterer\\BaldGuy\\baldguy'
+            for i in range(30):
+                if i >= 9:
+                    file = path + '00' + str(i + 1) + '.png'
+                else:
+                    file = path + '000' + str(i + 1) + '.png'
+
+                if i == 19:
+                    file = 'src\\assets\\art\\karakterer\\BaldGuy\\baldguy0030.png'
+
+                print(file)
+                self.runningsprites.append(pg.image.load(file).convert_alpha())
+
+            for i in range(30):
+                file = path + str(i + 32) + '.png'
+
+                self.holdingsprites.append(pg.image.load(file).convert_alpha())
+
+            self.standingSprite = pg.image.load(r'src\assets\art\karakterer\BaldGuy\baldguy0007.png').convert_alpha()
+            self.airSprite = pg.image.load(r'src\assets\art\karakterer\BaldGuy\baldguy0055.png').convert_alpha()
+
+        # rescaling
+        for i in range(len(self.runningsprites)):
+            self.runningsprites[i] = pg.transform.scale(self.runningsprites[i], (int(self.size.x), int(self.size.y)))
+        for i in range(len(self.holdingsprites)):
+            self.holdingsprites[i] = pg.transform.scale(self.holdingsprites[i], (int(self.size.x), int(self.size.y)))
+        self.standingSprite = pg.transform.scale(self.standingSprite, (int(self.size.x), int(self.size.y)))
+        self.airSprite = pg.transform.scale(self.airSprite, (int(self.size.x), int(self.size.y)))
+
+    def tick(self):
+        self.gravity()
+        self.checkCollisions()
+        self.selectBall()
+        self.ballAction()
+        self.HpHandler()
+        self.aiHandler()
+
+        self.pos.x += self.speed.x
+        self.pos.y += self.speed.y
+
+        self.rect.centerx = self.pos.x
+        self.rect.centery = self.pos.y
+
+        screen.blit(self.animation(), self.rect)
+        self.canJump = False
+        self.prev_hasBall = self.hasBall
+
+    def checkCollisions(self):
+        for block in blockList:
+            if self.rect.colliderect(block):
+                if self.rect.centery <= block.rect.centery:
+                    self.speed.y = -0.25
+                    self.canJump = True
+                else:
+                    self.speed.y = 2
+                    
+        if self.rect.colliderect(floor):
+            self.speed.y = -0.25
+            self.canJump = True
+
+        if self.rect.right >= SCREEN_WIDTH - 10:
+            while self.rect.right >= SCREEN_WIDTH - 10:
+                self.pos.x -= 1
+
+                self.rect.centerx = self.pos.x
+                self.rect.centery = self.pos.y
+                
+        if self.rect.left <= 10:
+            while self.rect.left <= 10:
+                self.pos.x += 1
+                
+                self.rect.centerx = self.pos.x
+                self.rect.centery = self.pos.y
+    
+    def gravity(self):
+        if self.speed.y <= 15:
+            self.speed.y += self.weight
+
+    def pickup(self):
+        if self.hasBall == False:
+            for ball in ballList:
+                if self.rect.colliderect(ball):
+                    self.ballType = ball.type
+                    self.hasBall = True
+                    if isMuted == False: self.pickupsfx.play()
+                    ballList.remove(ball)
+                    del ball
+        else:
+            mouse_pos = pymath.Vector2(pg.mouse.get_pos())
+            dir = pymath.Vector2(mouse_pos.x - self.pos.x, mouse_pos.y - self.pos.y)
+            dir = dir.normalize()
+
+            dir = (dir[0] * 25, dir[1] * 25)
+            
+            dir = (0 - dir[0], 0 - dir[1])
+
+            if self.ballType != "magic":
+                ball = Ball((self.pos.x, self.pos.y), speed=dir, type=self.ballType)
+            else:
+                ball = Ball((self.pos.x, self.pos.y), speed=(dir[0]/100, dir[1]/100), type=self.ballType)
+            ballList.append(ball)
+            self.hasBall = False
+            if isMuted == False: self.throwsfx.play()
+
+    def animation(self):
+        self.stateMachine()
+        img = self.standingSprite
+
+        if self.isOnGround:
+            self.current_frame += 1
+            if self.current_frame >= len(self.runningsprites):
+                self.current_frame = 0
+            if self.hasBall:
+                img = self.holdingsprites[self.current_frame]
+                if self.hasBall: self.drawBall()
+            else:
+                img = self.runningsprites[self.current_frame]
+            if self.speed.x <= 0.1 and self.speed.x >= -0.1:
+                img = self.standingSprite
+                if self.hasBall:
+                    img = self.airSprite
+        else:
+            if self.isGoingUp and self.hasBall == False:
+                img = self.standingSprite
+            else:
+                img = self.airSprite
+                if self.hasBall: self.drawBall()
+
+        if self.lastMoveDir.x == 1:
+            img = pg.transform.flip(img, True, False)
+
+        
+
+        return img
+
+    def stateMachine(self):
+        for block in blockList:
+            if self.rect.bottom + 3 <= block.rect.top:
+                self.isOnGround = True
+                break
+            else:
+                self.isOnGround = False
+            # lazy programming
+        if self.isOnGround:
+            self.isOnGround = False
+        else:
+            self.isOnGround = True
+
+        if self.speed.y < 2 and self.isOnGround == False:
+            self.isGoingUp = True
+        else:
+            self.isGoingUp = False
+
+    def drawBall(self):
+        ball = Ball((self.pos.x, self.pos.y - self.size.y / 2 + 5), type=self.ballType)
+        screen.blit(ball.image, ball.rect)
+        del ball
+
+    def selectBall(self):
+        keys = pg.key.get_pressed()
+        if self.hasBall:
+            if keys[pg.K_1]:
+                self.ballType = "basic"
+            elif keys[pg.K_2]:
+                self.ballType = "ice"
+            elif keys[pg.K_3]:
+                self.ballType = "steel"
+            elif keys[pg.K_4]:
+                self.ballType = "sun"
+            elif keys[pg.K_5]:
+                self.ballType = "nature"
+            elif keys[pg.K_6]:
+                self.ballType = "magic"
+            elif keys[pg.K_7]:
+                self.ballType = "soul"
+            elif keys[pg.K_8]:
+                self.ballType = "obsidian"
+
+    def ballAction(self):
+        self.weight = self.defaultWeight
+        if self.ballType == "obsidian" and self.hasBall:
+            self.weight = 2
+        if self.ballType == "steel" and self.hasBall:
+            self.weight = 1.25
+
+    def HpHandler(self):
+        for ball in ballList:
+            if ball.lifetime >= 3:
+                if self.rect.colliderect(ball):
+                    if ball.isThrown:
+                        if ball.type == "steel":
+                            self.speed.x = ball.speed.x / 2
+                            self.hp -= 5
+                        elif ball.type == "obsidian":
+                            self.speed.x = ball.speed.x / 1.1
+                            self.hp -= 0.5
+                        else:
+                            self.hp -= 1
+
+        text = str(int(self.hp)) + " / " + str(self.maxhp)
+        surf = game_font.render(text, True, (255, 255, 255))
+        rect = surf.get_rect(center = (self.pos.x, self.pos.y - 50))
+        screen.blit(surf, rect)
+
+    def aiHandler(self):
+        self.aiLoop()
+        self.aiAction()
+
+    def aiLoop(self):
+        self.timer += 1
+        if self.timer >= (self.timeTimer * FPS) + self.timerRandom:
+            self.timer = 0
+            self.timerRandom = random.randrange(0, 20) - 10
+            self.target = self.targetlist[random.randrange(0, len(self.targetlist) - 1) + 1]
+            print(self.target)
+
+    def aiAction(self):
+        # "", "left", "right", "jump", "ball", "ball", "away", "away"
+
+        if self.target == "left":
+            self.speed.x = 0 - self.max_speed
+            self.lastMoveDir.x = -1
+        else:
+            self.speed.x /= 1.9
+        
+        if self.target == "right":
+            self.speed.x = self.max_speed
+            self.lastMoveDir.x = 1
+                
+        if self.target == "jump" and self.canJump:
+            self.speed.y = 0 - self.max_speed * 2.2
+            if isMuted == False: self.jumpsfx.play()
+
+        if self.target == "away":
+            x = []
+            temp = 0
+            for player in playerList:
+                temp = self.pos.x - player.pos.x
+                x.append(temp)
+
+            for player in aiList:
+                if player != self:
+                    temp = self.pos.x - player.pos.x
+                    x.append(temp)
+
+            temp = get_closest_value(x, 0)
+
+            if temp < 0:
+                self.speed.x = 0 - self.max_speed
+                self.lastMoveDir.x = -1
+            else:
+                self.speed.x /= 1.9
+            if temp > 0:
+                self.speed.x = self.max_speed
+                self.lastMoveDir.x = 1
+
+        if self.target == "ball":
+            x = []
+            temp = 0
+            for player in ballList:
+                temp = self.pos.x - player.pos.x
+                x.append(temp)
+
+            temp = get_closest_value(x, 0)
+
+            if temp > 0:
+                self.speed.x = 0 - self.max_speed
+                self.lastMoveDir.x = -1
+            else:
+                self.speed.x /= 1.9
+            if temp < 0:
+                self.speed.x = self.max_speed
+                self.lastMoveDir.x = 1
 
 pg.mixer.pre_init(44100, -16, 2, 512)
 pg.init()
@@ -831,6 +1192,7 @@ load_music()
 blockList = []
 ballList = []
 playerList = []
+aiList = []
 
 startGame("default")
 
@@ -843,7 +1205,13 @@ loadSaves()
 
 hud = HUD()
 
+<<<<<<< HEAD
 >>>>>>> 0d7b8aa (h)
+=======
+ai = Ai((60, 60), (90, 50))
+aiList.append(ai)
+
+>>>>>>> 130e607 (d)
 while isRunning == True:
     for event in pg.event.get():
         if event.type == pg.QUIT:
@@ -889,8 +1257,16 @@ while isRunning == True:
         for player in playerList:
             player.tick()
     
+<<<<<<< HEAD
         for ball in ballList:
             ball.tick()
+=======
+    for ai in aiList:
+        ai.tick()
+    
+    for ball in ballList:
+        ball.tick()
+>>>>>>> 130e607 (d)
 
         if isInEditor:
             editor.tick()
