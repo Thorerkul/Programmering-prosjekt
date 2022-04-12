@@ -276,6 +276,7 @@ class Player:
             dir = (dir[0] * 25, dir[1] * 25)
             
             dir = (0 - dir[0], 0 - dir[1])
+            print(dir)
 
             if self.ballType != "magic":
                 ball = Ball((self.pos.x, self.pos.y), speed=dir, type=self.ballType)
@@ -827,7 +828,7 @@ class HUD:
         screen.blit(self.select_arrow, self.selectRect)
 
 class Ai:
-    def __init__(self, size, pos, char="billy"):
+    def __init__(self, size, pos, char="billy", type="norm"):
         self.pos = pymath.Vector2(pos)
         self.size = pymath.Vector2(size)
         self.speed = pymath.Vector2(0, 0)
@@ -858,12 +859,20 @@ class Ai:
         self.current_frame = 0
 
         self.target = ""
-        self.targetlist = ["", "left", "right", "jump", "ball", "ball", "away", "away"]
+        self.isGoingForTarget = True
         self.isGoingRight = False
         self.isMoving = False
         self.timer = 0
         self.timeTimer = 1
         self.timerRandom = random.randrange(0, 20) - 10
+        if type == "norm":
+            self.targetlist = ["", "left", "right", "jump", "ball", "ball", "away", "away"]
+        if type == "aggressive":
+            self.targetlist = ["", "left", "right", "jump", "ball", "ball", "away"]
+        if type == "dumb":
+            self.targetlist = ["", "left", "right", "jump", "left", "right", "jump", "ball", "ball", "away", "away"]
+        if type == "scared":
+            self.targetlist = ["", "left", "right", "jump", "ball", "away", "away"]
 
     def loadSprites(self):
         self.runningsprites = []
@@ -967,6 +976,7 @@ class Ai:
             self.speed.y += self.weight
 
     def pickup(self):
+        #print("y")
         if self.hasBall == False:
             for ball in ballList:
                 if self.rect.colliderect(ball):
@@ -976,13 +986,36 @@ class Ai:
                     ballList.remove(ball)
                     del ball
         else:
-            mouse_pos = pymath.Vector2(pg.mouse.get_pos())
+            y = []
+            x = []
+            temp = 0
+            for player in playerList:
+                temp = self.pos.x - player.pos.x
+                x.append(temp)
+
+            temp = get_closest_value(x, 0)
+            y.append(temp)
+
+            x = []
+            temp = 0
+            for player in playerList:
+                temp = self.pos.y - player.pos.y
+                x.append(temp)
+
+            temp = get_closest_value(x, 0)
+            y.append(temp)
+
+            y[0] = 0 - y[0]
+
+            #print(y)
+            mouse_pos = pymath.Vector2(y)
             dir = pymath.Vector2(mouse_pos.x - self.pos.x, mouse_pos.y - self.pos.y)
             dir = dir.normalize()
 
-            dir = (dir[0] * 25, dir[1] * 25)
+            dir = (dir[0] * 25, dir[1] * 10)
             
             dir = (0 - dir[0], 0 - dir[1])
+            print(dir)
 
             if self.ballType != "magic":
                 ball = Ball((self.pos.x, self.pos.y), speed=dir, type=self.ballType)
@@ -1093,6 +1126,7 @@ class Ai:
         screen.blit(surf, rect)
 
     def aiHandler(self):
+        #print("hasBall: ", self.hasBall, " isGoingForTarget: ", self.isGoingForTarget, " target: ", self.target, " ballList: ", ballList)
         self.aiLoop()
         self.aiAction()
 
@@ -1102,65 +1136,70 @@ class Ai:
             self.timer = 0
             self.timerRandom = random.randrange(0, 20) - 10
             self.target = self.targetlist[random.randrange(0, len(self.targetlist) - 1) + 1]
+            self.isGoingForTarget = True
             print(self.target)
 
     def aiAction(self):
         # "", "left", "right", "jump", "ball", "ball", "away", "away"
 
-        if self.target == "left":
-            self.speed.x = 0 - self.max_speed
-            self.lastMoveDir.x = -1
-        else:
-            self.speed.x /= 1.9
+        if self.isGoingForTarget:
+            if self.target == "left":
+                self.speed.x = 0 - self.max_speed
+                self.lastMoveDir.x = -1
+            else:
+                self.speed.x /= 1.9
         
-        if self.target == "right":
-            self.speed.x = self.max_speed
-            self.lastMoveDir.x = 1
+            if self.target == "right":
+                self.speed.x = self.max_speed
+                self.lastMoveDir.x = 1
                 
-        if self.target == "jump" and self.canJump:
-            self.speed.y = 0 - self.max_speed * 2.2
-            if isMuted == False: self.jumpsfx.play()
+            if self.target == "jump" and self.canJump:
+                self.speed.y = 0 - self.max_speed * 2.2
+                if isMuted == False: self.jumpsfx.play()
 
-        if self.target == "away":
-            x = []
-            temp = 0
-            for player in playerList:
-                temp = self.pos.x - player.pos.x
-                x.append(temp)
-
-            for player in aiList:
-                if player != self:
+            if self.target == "away":
+                x = []
+                temp = 0
+                for player in playerList:
                     temp = self.pos.x - player.pos.x
                     x.append(temp)
 
-            temp = get_closest_value(x, 0)
+                for player in aiList:
+                    if player != self:
+                        temp = self.pos.x - player.pos.x
+                        x.append(temp)
 
-            if temp < 0:
-                self.speed.x = 0 - self.max_speed
-                self.lastMoveDir.x = -1
-            else:
-                self.speed.x /= 1.9
-            if temp > 0:
-                self.speed.x = self.max_speed
-                self.lastMoveDir.x = 1
+                temp = get_closest_value(x, 0)
 
-        if self.target == "ball":
-            x = []
-            temp = 0
-            for player in ballList:
-                temp = self.pos.x - player.pos.x
-                x.append(temp)
+                if temp < 0:
+                    self.speed.x = 0 - self.max_speed
+                    self.lastMoveDir.x = -1
+                else:
+                    self.speed.x /= 1.9
+                if temp > 0:
+                    self.speed.x = self.max_speed
+                    self.lastMoveDir.x = 1
 
-            temp = get_closest_value(x, 0)
+            if self.target == "ball":
+                x = []
+                temp = 0
+                for player in ballList:
+                    temp = self.pos.x - player.pos.x
+                    x.append(temp)
 
-            if temp > 0:
-                self.speed.x = 0 - self.max_speed
-                self.lastMoveDir.x = -1
-            else:
-                self.speed.x /= 1.9
-            if temp < 0:
-                self.speed.x = self.max_speed
-                self.lastMoveDir.x = 1
+                if x != []:
+                    temp = get_closest_value(x, 0)
+
+                if temp > 0:
+                    self.speed.x = 0 - self.max_speed
+                    self.lastMoveDir.x = -1
+                else:
+                    self.speed.x /= 1.9
+                if temp < 0:
+                    self.speed.x = self.max_speed
+                    self.lastMoveDir.x = 1
+
+            self.pickup()
 
 pg.mixer.pre_init(44100, -16, 2, 512)
 pg.init()
@@ -1206,9 +1245,13 @@ loadSaves()
 hud = HUD()
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> 0d7b8aa (h)
 =======
 ai = Ai((60, 60), (90, 50))
+=======
+ai = Ai((60, 60), (90, 50), type="scared")
+>>>>>>> 5a6f70d (dumb ai)
 aiList.append(ai)
 
 >>>>>>> 130e607 (d)
@@ -1283,5 +1326,8 @@ while isRunning == True:
 
     pg.display.update()
     clock.tick(FPS)
+
+
+    #print(ballList)
 
 quit()
