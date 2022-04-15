@@ -125,6 +125,12 @@ class Player:
         self.maxhp = 100
         self.hp = self.maxhp
 
+        self.statusEffect = ""
+        self.hasStatus = False
+        self.prevHasStatus = False
+        self.statusTimer = 0
+        
+
         self.ballType = ""  
 
         self.jumpsfx = pg.mixer.Sound(r'assets\lyd\jump.wav')
@@ -196,6 +202,7 @@ class Player:
         self.selectBall()
         self.ballAction()
         self.HpHandler()
+        self.statusHandler()
 
         self.pos.x += self.speed.x
         self.pos.y += self.speed.y
@@ -206,6 +213,7 @@ class Player:
         screen.blit(self.animation(), self.rect)
         self.canJump = False
         self.prev_hasBall = self.hasBall
+        self.prevHasStatus = self.hasStatus
 
     def movementHandler(self):
         if self.char == "billy":
@@ -378,6 +386,18 @@ class Player:
                         elif ball.type == "obsidian":
                             self.speed.x = ball.speed.x / 1.1
                             self.hp -= 0.5
+                        elif ball.type == "sun":
+                            self.statusEffect = "fire"
+                            self.hasStatus = True
+                            self.hp -= 1
+                        elif ball.type == "ice":
+                            self.statusEffect = "frozen"
+                            self.hasStatus = True
+                            self.hp -= 1
+                        elif ball.type == "nature":
+                            self.statusEffect = "stuck"
+                            self.hasStatus = True
+                            self.hp -= 1
                         else:
                             self.hp -= 1
 
@@ -385,6 +405,9 @@ class Player:
         surf = game_font.render(text, True, (255, 255, 255))
         rect = surf.get_rect(center = (self.pos.x, self.pos.y - 50))
         screen.blit(surf, rect)
+
+    def statusHandler(self):
+        pass
 
 class Block:
     def __init__(self, pos, size):
